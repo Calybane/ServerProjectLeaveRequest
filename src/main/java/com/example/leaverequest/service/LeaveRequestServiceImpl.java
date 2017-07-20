@@ -31,9 +31,15 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
     }
     
     @Override
+    public List<LeaveRequest> getAllLeaveRequestsInWaiting()
+    {
+        return leaveRequestRepository.findAllByStatusLike(Status.WAITINGAPPROVAL);
+    }
+    
+    @Override
     public List<LeaveRequest> getAllLeaveRequestsByPersonId(long personId)
     {
-        return leaveRequestRepository.findByPersonIdOrderByLeaveFrom(personId);
+        return leaveRequestRepository.findAllByPersonIdOrderByStatusAscLeaveFromAsc(personId);
     }
     
     @Override

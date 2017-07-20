@@ -40,6 +40,13 @@ public class LeaveRequestController
     }
     
     
+    @RequestMapping(method = GET, path = "/waiting", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<LeaveRequest>> getAllLeaveRequestsInWaiting()
+    {
+        return new ResponseEntity(leaveRequestService.getAllLeaveRequestsInWaiting(), HttpStatus.OK);
+    }
+    
+    
     @RequestMapping(method = GET, path = "/person/{id}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<List<LeaveRequest>> getAllLeaveRequestsByPersonId(@PathVariable(value = "id") final long id)
     {

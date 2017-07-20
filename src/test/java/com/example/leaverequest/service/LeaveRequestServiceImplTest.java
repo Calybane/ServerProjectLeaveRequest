@@ -19,9 +19,6 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 
-/**
- * Created by admin on 19/07/2017.
- */
 @RunWith(MockitoJUnitRunner.class)
 public class LeaveRequestServiceImplTest
 {
@@ -54,6 +51,20 @@ public class LeaveRequestServiceImplTest
         //When
         List<LeaveRequest> allLeaveRequests = classUnderTest.getAllLeaveRequests();
     
+        //Then
+        assertEquals(allLeaveRequests.size(), 1);
+        assertEquals(allLeaveRequests.get(0), leaveRequest);
+    }
+    
+    @Test
+    public void getAllLeaveRequestsInWaiting() {
+        //Given
+        LeaveRequest leaveRequest = Mockito.mock(LeaveRequest.class);
+        Mockito.when(leaveRequestRepository.findAllByStatusLike(Status.WAITINGAPPROVAL)).thenReturn(Arrays.asList(leaveRequest));
+        
+        //When
+        List<LeaveRequest> allLeaveRequests = classUnderTest.getAllLeaveRequestsInWaiting();
+        
         //Then
         assertEquals(allLeaveRequests.size(), 1);
         assertEquals(allLeaveRequests.get(0), leaveRequest);

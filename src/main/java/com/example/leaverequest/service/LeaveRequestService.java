@@ -11,6 +11,8 @@ public interface LeaveRequestService
     
     List<LeaveRequest> getAllLeaveRequests();
     
+    List<LeaveRequest> getAllLeaveRequestsInWaiting();
+    
     List<LeaveRequest> getAllLeaveRequestsByPersonId(long personId);
     
     LeaveRequest getLeaveRequestById(long id);
