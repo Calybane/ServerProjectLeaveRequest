@@ -34,53 +34,36 @@ public class LeaveRequestController
     
     
     @RequestMapping(method = GET, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<LeaveRequestDTO>> getAllLeaveRequests()
+    public ResponseEntity<List<LeaveRequest>> getAllLeaveRequests()
     {
         return new ResponseEntity(leaveRequestService.getAllLeaveRequests(), HttpStatus.OK);
     }
     
     
     @RequestMapping(method = GET, path = "/person/{id}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<LeaveRequestDTO>> getAllLeaveRequestsByPersonId(@PathVariable(value = "id") final long id)
+    public ResponseEntity<List<LeaveRequest>> getAllLeaveRequestsByPersonId(@PathVariable(value = "id") final long id)
     {
         return new ResponseEntity(leaveRequestService.getAllLeaveRequestsByPersonId(id), HttpStatus.OK);
     }
     
     
     @RequestMapping(method = GET, path = "/{id}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<LeaveRequestDTO> getLeaveRequestById(@PathVariable(value = "id") final long id)
+    public ResponseEntity<LeaveRequest> getLeaveRequestById(@PathVariable(value = "id") final long id)
     {
         return new ResponseEntity(leaveRequestService.getLeaveRequestById(id), HttpStatus.OK);
     }
     
     
     @RequestMapping(method = PUT, path = "/{id}/changestatus/approved", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<LeaveRequestDTO> updateLeaveRequestStatusApproved(@PathVariable("id") final long id)
+    public ResponseEntity<LeaveRequest> updateLeaveRequestStatusApproved(@PathVariable("id") final long id)
     {
-        LeaveRequest leaveRequest = leaveRequestService.updateLeaveRequestStatusApproved(id);
-        if(leaveRequest != null)
-        {
-            return new ResponseEntity(leaveRequest, HttpStatus.OK);
-        }
-        else
-        {
-            return new ResponseEntity(null, HttpStatus.NOT_MODIFIED);
-        }
+        return new ResponseEntity(leaveRequestService.updateLeaveRequestStatusApproved(id), HttpStatus.OK);
     }
     
     
     @RequestMapping(method = PUT, path = "/{id}/changestatus/rejected", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<LeaveRequestDTO> updateLeaveRequestStatusRejected(@PathVariable("id") final long id)
+    public ResponseEntity<LeaveRequest> updateLeaveRequestStatusRejected(@PathVariable("id") final long id)
     {
-        LeaveRequest leaveRequest = leaveRequestService.updateLeaveRequestStatusRejected(id);
-        if(leaveRequest != null)
-        {
-            return new ResponseEntity(leaveRequest, HttpStatus.OK);
-        }
-        else
-        {
-            return new ResponseEntity(null, HttpStatus.NOT_MODIFIED);
-        }
-        
+        return new ResponseEntity(leaveRequestService.updateLeaveRequestStatusRejected(id), HttpStatus.OK);
     }
 }

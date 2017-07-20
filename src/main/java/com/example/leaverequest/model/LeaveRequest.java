@@ -17,12 +17,9 @@ public class LeaveRequest
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     
-    @Min(1)
     @Column(nullable = false)
     private long personId;
     
-    @NotBlank
-    @Size(max = 100)
     @Column(nullable = false)
     private String typeAbsence;
     
@@ -32,7 +29,6 @@ public class LeaveRequest
     @Column(nullable = false)
     private Date leaveTo;
     
-    @Min(1)
     @Column(nullable = false)
     private int daysTaken;
     
@@ -66,9 +62,10 @@ public class LeaveRequest
         return id;
     }
     
-    public void setId(long id)
+    public LeaveRequest setId(long id)
     {
         this.id = id;
+        return this;
     }
     
     public long getPersonId()
@@ -76,9 +73,10 @@ public class LeaveRequest
         return personId;
     }
     
-    public void setPersonId(long personId)
+    public LeaveRequest setPersonId(long personId)
     {
         this.personId = personId;
+        return this;
     }
     
     public String getTypeAbsence()
@@ -86,9 +84,10 @@ public class LeaveRequest
         return typeAbsence;
     }
     
-    public void setTypeAbsence(String typeAbsence)
+    public LeaveRequest setTypeAbsence(String typeAbsence)
     {
         this.typeAbsence = typeAbsence;
+        return this;
     }
     
     public Date getLeaveFrom()
@@ -96,9 +95,10 @@ public class LeaveRequest
         return leaveFrom;
     }
     
-    public void setLeaveFrom(Date leaveFrom)
+    public LeaveRequest setLeaveFrom(Date leaveFrom)
     {
         this.leaveFrom = leaveFrom;
+        return this;
     }
     
     public Date getLeaveTo()
@@ -106,9 +106,10 @@ public class LeaveRequest
         return leaveTo;
     }
     
-    public void setLeaveTo(Date leaveTo)
+    public LeaveRequest setLeaveTo(Date leaveTo)
     {
         this.leaveTo = leaveTo;
+        return this;
     }
     
     public int getDaysTaken()
@@ -116,9 +117,10 @@ public class LeaveRequest
         return daysTaken;
     }
     
-    public void setDaysTaken(int daysTaken)
+    public LeaveRequest setDaysTaken(int daysTaken)
     {
         this.daysTaken = daysTaken;
+        return this;
     }
     
     public Date getRequestDate()
@@ -126,9 +128,10 @@ public class LeaveRequest
         return requestDate;
     }
     
-    public void setRequestDate(Date requestDate)
+    public LeaveRequest setRequestDate(Date requestDate)
     {
         this.requestDate = requestDate;
+        return this;
     }
     
     public Date getApprovalDate()
@@ -136,9 +139,10 @@ public class LeaveRequest
         return approvalDate;
     }
     
-    public void setApprovalDate(Date approvalDate)
+    public LeaveRequest setApprovalDate(Date approvalDate)
     {
         this.approvalDate = approvalDate;
+        return this;
     }
     
     public String getStatus()
@@ -146,9 +150,10 @@ public class LeaveRequest
         return status;
     }
     
-    public void setStatus(String status)
+    public LeaveRequest setStatus(String status)
     {
         this.status = status;
+        return this;
     }
     
     @Override

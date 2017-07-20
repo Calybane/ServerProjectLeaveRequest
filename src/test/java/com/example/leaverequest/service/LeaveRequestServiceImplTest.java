@@ -5,22 +5,18 @@ import com.example.leaverequest.exception.EntityNotFoundException;
 import com.example.leaverequest.model.LeaveRequest;
 import com.example.leaverequest.model.Status;
 import com.example.leaverequest.repository.LeaveRequestRepository;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 
 /**
@@ -94,6 +90,21 @@ public class LeaveRequestServiceImplTest
         //Then
         Mockito.verify(mockedLeaveRequest).setStatus(Status.APPROVED);
         Mockito.verify(leaveRequestRepository).save(mockedLeaveRequest);
+    }
+    
+    @Test
+    public void rejectExistingLeaveRequest() {
+        //Given
+        LeaveRequest mockedLeaveRequest = Mockito.mock(LeaveRequest.class);
+        LeaveRequest savedLeaveRequest = Mockito.mock(LeaveRequest.class);
+        Mockito.when(leaveRequestRepository.findOne(2L)).thenReturn(mockedLeaveRequest);
+        Mockito.when(leaveRequestRepository.save(mockedLeaveRequest)).thenReturn(savedLeaveRequest);
         
+        //When
+        LeaveRequest leaveRequest = classUnderTest.updateLeaveRequestStatusRejected(2L);
+    
+        //Then
+        Mockito.verify(mockedLeaveRequest).setStatus(Status.REJECTED);
+        assertEquals(savedLeaveRequest, leaveRequest);
     }
 }
