@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dataset>
+    <leave_request id="1" person_id="1" status="Waiting for approval"/>
+    <leave_request id="2" person_id="2" status="Approved"/>
+    <leave_request id="4" person_id="37" status="Approved"/>
+    <leave_request id="8" person_id="23" status="Rejected"/>
+</dataset>

@@ -1,44 +1,42 @@
 package com.example.leaverequest.model;
 
 import com.example.leaverequest.dto.LeaveRequestDTO;
-import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.*;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Entity
-@Table
+@Table(name = "LEAVE_REQUEST")
 public class LeaveRequest
 {
     @Id
-    @Column(nullable = false)
+    @Column(nullable = false, name = "ID")
+    /*@Column(nullable = false)*/
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     
-    @Column(nullable = false)
+    @Column(nullable = false, name = "PERSON_ID")
     private long personId;
     
-    @Column(nullable = false)
+    /*@Column(nullable = false)*/
     private String typeAbsence;
     
-    @Column(nullable = false)
+    /*@Column(nullable = false)*/
     private Date leaveFrom;
     
-    @Column(nullable = false)
+    /*@Column(nullable = false)*/
     private Date leaveTo;
     
-    @Column(nullable = false)
+    /*@Column(nullable = false)*/
     private int daysTaken;
     
-    @Column(nullable = false)
+    /*@Column(nullable = false)*/
     private Date requestDate;
     
     @Column
     private Date approvalDate;
     
-    @Column
+    @Column(name = "STATUS")
     private String status;
     
     

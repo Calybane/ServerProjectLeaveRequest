@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.Date;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -64,13 +63,13 @@ public class LeaveRequestController
     @RequestMapping(method = PUT, path = "/{id}/changestatus/approved", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<LeaveRequest> updateLeaveRequestStatusApproved(@PathVariable("id") final long id)
     {
-        return new ResponseEntity(leaveRequestService.updateLeaveRequestStatusApproved(id), HttpStatus.OK);
+        return new ResponseEntity(leaveRequestService.updateLeaveRequestApproved(id), HttpStatus.OK);
     }
     
     
     @RequestMapping(method = PUT, path = "/{id}/changestatus/rejected", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<LeaveRequest> updateLeaveRequestStatusRejected(@PathVariable("id") final long id)
     {
-        return new ResponseEntity(leaveRequestService.updateLeaveRequestStatusRejected(id), HttpStatus.OK);
+        return new ResponseEntity(leaveRequestService.updateLeaveRequestRejected(id), HttpStatus.OK);
     }
 }

@@ -17,7 +17,7 @@ public interface LeaveRequestService
     
     LeaveRequest getLeaveRequestById(long id);
     
-    LeaveRequest updateLeaveRequestStatusApproved(long id);
+    LeaveRequest updateLeaveRequestApproved(long id);
     
-    LeaveRequest updateLeaveRequestStatusRejected(long id);
+    LeaveRequest updateLeaveRequestRejected(long id);
 }

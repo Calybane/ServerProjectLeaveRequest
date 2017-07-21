@@ -6,6 +6,7 @@ import com.example.leaverequest.model.LeaveRequest;
 import com.example.leaverequest.model.Status;
 import com.example.leaverequest.repository.LeaveRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -17,6 +18,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
     @Autowired
     LeaveRequestRepository leaveRequestRepository;
     
+    
     @Override
     public LeaveRequest createLeaveRequest(LeaveRequestDTO dto)
     {
@@ -27,13 +29,13 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
     @Override
     public List<LeaveRequest> getAllLeaveRequests()
     {
-        return leaveRequestRepository.findAll();
+        return leaveRequestRepository.findAll(new Sort(Sort.Direction.ASC, "leaveFrom"));
     }
     
     @Override
     public List<LeaveRequest> getAllLeaveRequestsInWaiting()
     {
-        return leaveRequestRepository.findAllByStatusLike(Status.WAITINGAPPROVAL);
+        return leaveRequestRepository.findAllByStatusLike(Status.WAITINGAPPROVAL, new Sort(Sort.Direction.ASC, "leaveFrom"));
     }
     
     @Override
@@ -49,7 +51,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
     }
     
     @Override
-    public LeaveRequest updateLeaveRequestStatusApproved(long id)
+    public LeaveRequest updateLeaveRequestApproved(long id)
     {
         LeaveRequest leaveRequest = leaveRequestRepository.findOne(id);
         if(leaveRequest == null)
@@ -65,7 +67,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
     }
     
     @Override
-    public LeaveRequest updateLeaveRequestStatusRejected(long id)
+    public LeaveRequest updateLeaveRequestRejected(long id)
     {
         LeaveRequest leaveRequest = leaveRequestRepository.findOne(id);
         if(leaveRequest == null)

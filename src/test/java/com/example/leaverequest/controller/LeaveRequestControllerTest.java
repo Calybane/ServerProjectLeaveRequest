@@ -124,7 +124,7 @@ public class LeaveRequestControllerTest extends ControllerTest
     {
         //Given
         LeaveRequest returnedLeaveRequest = new LeaveRequest().setId(1L).setStatus(Status.APPROVED);
-        Mockito.when(leaveRequestService.updateLeaveRequestStatusApproved(1L)).thenReturn(returnedLeaveRequest);
+        Mockito.when(leaveRequestService.updateLeaveRequestApproved(1L)).thenReturn(returnedLeaveRequest);
     
         mockMvc.perform(put("/api/leaverequest/1/changestatus/approved"))
                 .andExpect(status().isOk())
@@ -136,7 +136,7 @@ public class LeaveRequestControllerTest extends ControllerTest
     {
         //Given
         LeaveRequest returnedLeaveRequest = new LeaveRequest().setId(1L).setStatus(Status.REJECTED);
-        Mockito.when(leaveRequestService.updateLeaveRequestStatusRejected(1L)).thenReturn(returnedLeaveRequest);
+        Mockito.when(leaveRequestService.updateLeaveRequestRejected(1L)).thenReturn(returnedLeaveRequest);
         
         mockMvc.perform(put("/api/leaverequest/1/changestatus/rejected"))
                 .andExpect(status().isOk())

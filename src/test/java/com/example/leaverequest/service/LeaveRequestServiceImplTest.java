@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.data.domain.Sort;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -60,7 +61,8 @@ public class LeaveRequestServiceImplTest
     public void getAllLeaveRequestsInWaiting() {
         //Given
         LeaveRequest leaveRequest = Mockito.mock(LeaveRequest.class);
-        Mockito.when(leaveRequestRepository.findAllByStatusLike(Status.WAITINGAPPROVAL)).thenReturn(Arrays.asList(leaveRequest));
+        Mockito.when(leaveRequestRepository.findAllByStatusLike(Status.WAITINGAPPROVAL, new Sort(Sort.Direction.ASC, "leaveFrom")))
+                .thenReturn(Arrays.asList(leaveRequest));
         
         //When
         List<LeaveRequest> allLeaveRequests = classUnderTest.getAllLeaveRequestsInWaiting();
@@ -86,7 +88,7 @@ public class LeaveRequestServiceImplTest
     @Test(expected = EntityNotFoundException.class)
     public void approveInexistingLeaveRequest() {
         Mockito.when(leaveRequestRepository.findOne(2L)).thenReturn(null);
-        classUnderTest.updateLeaveRequestStatusApproved(2L);
+        classUnderTest.updateLeaveRequestApproved(2L);
     }
     
     @Test
@@ -96,7 +98,7 @@ public class LeaveRequestServiceImplTest
         Mockito.when(leaveRequestRepository.findOne(2L)).thenReturn(mockedLeaveRequest);
     
         //When
-        classUnderTest.updateLeaveRequestStatusApproved(2L);
+        classUnderTest.updateLeaveRequestApproved(2L);
         
         //Then
         Mockito.verify(mockedLeaveRequest).setStatus(Status.APPROVED);
@@ -112,7 +114,7 @@ public class LeaveRequestServiceImplTest
         Mockito.when(leaveRequestRepository.save(mockedLeaveRequest)).thenReturn(savedLeaveRequest);
         
         //When
-        LeaveRequest leaveRequest = classUnderTest.updateLeaveRequestStatusRejected(2L);
+        LeaveRequest leaveRequest = classUnderTest.updateLeaveRequestRejected(2L);
     
         //Then
         Mockito.verify(mockedLeaveRequest).setStatus(Status.REJECTED);
