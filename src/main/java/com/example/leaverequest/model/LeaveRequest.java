@@ -1,8 +1,11 @@
 package com.example.leaverequest.model;
 
 import com.example.leaverequest.dto.LeaveRequestDTO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
+import java.text.*;
+import java.util.Arrays;
 import java.util.Date;
 
 @Entity
@@ -18,29 +21,35 @@ public class LeaveRequest
     @Column(nullable = false, name = "PERSON_ID")
     private long personId;
     
-    /*@Column(nullable = false)*/
+    @Column(nullable = false, name = "TYPE_ABSENCE")
     private String typeAbsence;
     
-    /*@Column(nullable = false)*/
+    @Column(nullable = false, name = "LEAVE_FROM")
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date leaveFrom;
     
-    /*@Column(nullable = false)*/
+    @Column(nullable = false, name = "LEAVE_TO")
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date leaveTo;
     
-    /*@Column(nullable = false)*/
+    @Column(nullable = false, name = "DAYS_TAKEN")
     private int daysTaken;
     
-    /*@Column(nullable = false)*/
+    @Column(nullable = false, name = "REQUEST_DATE")
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date requestDate;
     
-    @Column
+    @Column(name = "APPROVAL_DATE")
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date approvalDate;
     
-    @Column(name = "STATUS")
+    @Column(nullable = false, name = "STATUS")
     private String status;
     
     
-    public LeaveRequest(){}
+    public LeaveRequest()
+    {
+    }
     
     public LeaveRequest(LeaveRequestDTO dto)
     {
@@ -168,5 +177,17 @@ public class LeaveRequest
                 ", approvalDate=" + approvalDate +
                 ", status='" + status + '\'' +
                 '}';
+    }
+    
+    public boolean valid()
+    {
+        // TODO : verify the days taken with the days left of the user, when the users will be taking in count
+        
+        if(this.leaveFrom.after(this.leaveTo)) return false;
+        if(this.daysTaken <= 0) return false;
+        String[] typesAbsence = TypesAbsence.typesAbsence();
+        if(Arrays.stream(typesAbsence).noneMatch(type -> type.equalsIgnoreCase(this.typeAbsence))) return false;
+        
+        return true;
     }
 }

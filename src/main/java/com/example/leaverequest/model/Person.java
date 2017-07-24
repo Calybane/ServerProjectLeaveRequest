@@ -9,20 +9,20 @@ import javax.persistence.*;
 public class Person
 {
     @Id
-    @Column(nullable = false)
+    @Column(nullable = false, name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     
-    @Column(nullable = false)
+    @Column(nullable = false, name = "LASTNAME")
     private String lastname;
     
-    @Column(nullable = false)
+    @Column(nullable = false, name = "FIRSTNAME")
     private String firstname;
     
-    @Column(nullable = false)
+    @Column(nullable = false, name = "DAYS_LEFT")
     private Integer daysLeft;
     
-    @Column(nullable = false)
+    @Column(nullable = false, name = "ROLE")
     private String role;
     
     

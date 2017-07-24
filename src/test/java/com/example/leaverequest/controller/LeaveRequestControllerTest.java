@@ -3,10 +3,16 @@ package com.example.leaverequest.controller;
 import com.example.leaverequest.dto.LeaveRequestDTO;
 import com.example.leaverequest.model.LeaveRequest;
 import com.example.leaverequest.model.Status;
+import com.example.leaverequest.model.TypesAbsence;
 import com.example.leaverequest.service.LeaveRequestService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.*;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -21,6 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@EnableSpringDataWebSupport
 public class LeaveRequestControllerTest extends ControllerTest
 {
     private MockMvc mockMvc;
@@ -31,6 +38,9 @@ public class LeaveRequestControllerTest extends ControllerTest
     @InjectMocks
     LeaveRequestController classUnderTest;
     
+    @InjectMocks
+    PageableHandlerMethodArgumentResolver pageableArgumentResolver;
+    
     @Captor
     ArgumentCaptor<LeaveRequestDTO> dtoCaptor;
     
@@ -38,7 +48,9 @@ public class LeaveRequestControllerTest extends ControllerTest
     public void setUpControllerTestSupport()
     {
         MockitoAnnotations.initMocks(this);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(classUnderTest).build();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(classUnderTest)
+                .setCustomArgumentResolvers(pageableArgumentResolver)
+                .build();
     }
     
     @Test
@@ -65,22 +77,25 @@ public class LeaveRequestControllerTest extends ControllerTest
         //Given
         List<LeaveRequest> leaveRequests = new ArrayList<>();
         leaveRequests.add(new LeaveRequest().setStatus(Status.APPROVED).setId(2L));
-        Mockito.when(leaveRequestService.getAllLeaveRequests()).thenReturn(leaveRequests);
+        Mockito.when(leaveRequestService.getAllLeaveRequests(new PageRequest(0,10))).thenReturn(new
+                PageImpl<LeaveRequest>(leaveRequests, new PageRequest(0,10), 100));
     
-        mockMvc.perform(get("/api/leaverequest"))
+        mockMvc.perform(get("/api/leaverequest").param("page","0").param("size","10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()", is(1)))
-                .andExpect(jsonPath("$[0].status", is(Status.APPROVED)))
-                .andExpect(jsonPath("$[0].id", is(2)));
+                .andExpect(jsonPath("content.size()", is(1)))
+                .andExpect(jsonPath("size", is(10)))
+                .andExpect(jsonPath("content[0].status", is(Status.APPROVED)))
+                .andExpect(jsonPath("content[0].id", is(2)));
     }
     
     @Test
-    public void getAllLeaveRequestsInWaiting() throws Exception
+    public void getAllLeaveRequestsByStatus() throws Exception
     {
         //Given
         List<LeaveRequest> leaveRequests = new ArrayList<>();
         leaveRequests.add(new LeaveRequest().setStatus(Status.WAITINGAPPROVAL).setId(2L));
-        Mockito.when(leaveRequestService.getAllLeaveRequestsInWaiting()).thenReturn(leaveRequests);
+        Mockito.when(leaveRequestService.getAllLeaveRequestsByStatus(Status.WAITINGAPPROVAL, new Sort(Sort.Direction.ASC, "leaveFrom"))).thenReturn
+                (leaveRequests);
         
         mockMvc.perform(get("/api/leaverequest/waiting"))
                 .andExpect(status().isOk())
@@ -141,5 +156,17 @@ public class LeaveRequestControllerTest extends ControllerTest
         mockMvc.perform(put("/api/leaverequest/1/changestatus/rejected"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status", is(Status.REJECTED)));
+    }
+    
+    @Test
+    public void  getAllTypesAbsence() throws Exception
+    {
+        //Given
+        String[] types = TypesAbsence.typesAbsence();
+        Mockito.when(leaveRequestService.getAllTypesAbsence()).thenReturn(types);
+    
+        mockMvc.perform(get("/api/leaverequest/typesabsence"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", is(2)));
     }
 }

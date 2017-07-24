@@ -19,6 +19,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 
+import java.lang.invoke.LambdaConversionException;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -35,9 +37,20 @@ public class LeaveRequestRepositoryTest extends AbstractTransactionalJUnit4Sprin
     LeaveRequestRepository leaveRequestRepository;
     
     @Test
-    public void findAllByPersonIdOrderByStatusAscLeaveFromAsc() throws Exception
+    public void findAll() throws Exception
     {
-        List<LeaveRequest> all = leaveRequestRepository.findAllByPersonIdOrderByStatusAscLeaveFromAsc(1L);
+        List<LeaveRequest> all = leaveRequestRepository.findAll(new Sort(Sort.Direction.ASC, "leaveFrom"));
+        Assert.assertEquals(all.size(), 5);
+        Assert.assertTrue("First date (" + all.get(0).getLeaveFrom() + ") should be lower or equals than second (" +
+                all.get(1).getLeaveFrom() + ")", all.get(0).getLeaveFrom().compareTo(all.get(1).getLeaveFrom()) <= 0);
+        Assert.assertTrue("First date (" + all.get(0).getLeaveFrom() + ") should be lower or equals than second (" +
+                all.get(1).getLeaveFrom() + ")", all.get(1).getLeaveFrom().compareTo(all.get(2).getLeaveFrom()) <= 0);
+    }
+    
+    @Test
+    public void findAllByPersonId() throws Exception
+    {
+        List<LeaveRequest> all = leaveRequestRepository.findAllByPersonId(1L);
         Assert.assertEquals(all.size(), 1);
         Assert.assertEquals(all.get(0).getPersonId(), 1L);
     }
@@ -45,11 +58,26 @@ public class LeaveRequestRepositoryTest extends AbstractTransactionalJUnit4Sprin
     @Test
     public void findAllByStatusLike() throws Exception
     {
-        List<LeaveRequest> all = leaveRequestRepository.findAllByStatusLike(Status.APPROVED, new Sort(Sort.Direction.ASC, "personId"));
+        List<LeaveRequest> all = leaveRequestRepository.findAllByStatusLike(Status.WAITINGAPPROVAL, new Sort(Sort.Direction.ASC, "leaveFrom"));
+        Assert.assertEquals(all.size(), 3);
+        Assert.assertEquals(all.get(0).getStatus(), Status.WAITINGAPPROVAL);
+        Assert.assertEquals(all.get(1).getStatus(), Status.WAITINGAPPROVAL);
+        Assert.assertEquals(all.get(2).getStatus(), Status.WAITINGAPPROVAL);
+        Assert.assertTrue("First date (" + all.get(0).getLeaveFrom() + ") should be lower or equals than second (" +
+                all.get(1).getLeaveFrom() + ")", all.get(0).getLeaveFrom().compareTo(all.get(1).getLeaveFrom()) <= 0);
+    }
+    
+    @Test
+    public void findAllByStatusLikeAndLeaveFromAfter() throws Exception
+    {
+        List<LeaveRequest> all = leaveRequestRepository.findAllByStatusLikeAndLeaveFromAfter(Status.WAITINGAPPROVAL, new Date(), new Sort(Sort.Direction.ASC, "leaveFrom"));
         Assert.assertEquals(all.size(), 2);
-        Assert.assertEquals(all.get(0).getStatus(), Status.APPROVED);
-        Assert.assertEquals(all.get(1).getStatus(), Status.APPROVED);
-        Assert.assertNotSame(all.get(0).getPersonId(), all.get(1).getPersonId());
+        Assert.assertEquals(all.get(0).getStatus(), Status.WAITINGAPPROVAL);
+        Assert.assertEquals(all.get(1).getStatus(), Status.WAITINGAPPROVAL);
+        Assert.assertTrue("First date (" + all.get(0).getLeaveFrom() + ") should be greather than today (" +
+                new Date() + ")", all.get(0).getLeaveFrom().after(new Date()));
+        Assert.assertTrue("First date (" + all.get(0).getLeaveFrom() + ") should be lower or equals than second (" +
+                all.get(1).getLeaveFrom() + ")", all.get(0).getLeaveFrom().compareTo(all.get(1).getLeaveFrom()) <= 0);
     }
     
 }

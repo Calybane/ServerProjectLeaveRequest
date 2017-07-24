@@ -2,8 +2,12 @@ package com.example.leaverequest.controller;
 
 import com.example.leaverequest.dto.LeaveRequestDTO;
 import com.example.leaverequest.model.LeaveRequest;
+import com.example.leaverequest.model.Status;
 import com.example.leaverequest.service.LeaveRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +28,7 @@ public class LeaveRequestController
     @Autowired
     LeaveRequestService leaveRequestService;
     
+    
     @RequestMapping(method = POST, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Long> createLeaveRequest(@Valid @RequestBody final LeaveRequestDTO dto)
     {
@@ -33,16 +38,18 @@ public class LeaveRequestController
     
     
     @RequestMapping(method = GET, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<LeaveRequest>> getAllLeaveRequests()
+    // public ResponseEntity<List<LeaveRequest>> getAllLeaveRequests()
+    public Page<LeaveRequest> getAllLeaveRequests(final Pageable pageable)
     {
-        return new ResponseEntity(leaveRequestService.getAllLeaveRequests(), HttpStatus.OK);
+        return leaveRequestService.getAllLeaveRequests(pageable);
+        // return new ResponseEntity(leaveRequestService.getAllLeaveRequests(), HttpStatus.OK);
     }
     
     
     @RequestMapping(method = GET, path = "/waiting", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<LeaveRequest>> getAllLeaveRequestsInWaiting()
+    public ResponseEntity<List<LeaveRequest>> getAllLeaveRequestsByStatus()
     {
-        return new ResponseEntity(leaveRequestService.getAllLeaveRequestsInWaiting(), HttpStatus.OK);
+        return new ResponseEntity(leaveRequestService.getAllLeaveRequestsByStatus(Status.WAITINGAPPROVAL, new Sort(Sort.Direction.ASC, "leaveFrom")), HttpStatus.OK);
     }
     
     
@@ -71,5 +78,12 @@ public class LeaveRequestController
     public ResponseEntity<LeaveRequest> updateLeaveRequestStatusRejected(@PathVariable("id") final long id)
     {
         return new ResponseEntity(leaveRequestService.updateLeaveRequestRejected(id), HttpStatus.OK);
+    }
+    
+    
+    @RequestMapping(method = GET, path = "/typesabsence", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<String[]> getAllTypesAbsence()
+    {
+        return new ResponseEntity(leaveRequestService.getAllTypesAbsence(), HttpStatus.OK);
     }
 }

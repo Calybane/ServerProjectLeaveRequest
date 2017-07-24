@@ -1,14 +1,17 @@
 package com.example.leaverequest.service;
 
 import com.example.leaverequest.dto.LeaveRequestDTO;
+import com.example.leaverequest.exception.EntityBadInformationsException;
 import com.example.leaverequest.exception.EntityNotFoundException;
 import com.example.leaverequest.model.LeaveRequest;
 import com.example.leaverequest.model.Status;
+import com.example.leaverequest.model.TypesAbsence;
 import com.example.leaverequest.repository.LeaveRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
 import java.util.Date;
 import java.util.List;
 
@@ -23,25 +26,38 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
     public LeaveRequest createLeaveRequest(LeaveRequestDTO dto)
     {
         LeaveRequest leaveRequest = new LeaveRequest(dto);
-        return leaveRequestRepository.save(leaveRequest);
+        if (leaveRequest.valid())
+        {
+            return leaveRequestRepository.save(leaveRequest);
+        }
+        else
+        {
+            throw new EntityBadInformationsException("Leave request informations are incorrect");
+        }
     }
     
     @Override
     public List<LeaveRequest> getAllLeaveRequests()
     {
-        return leaveRequestRepository.findAll(new Sort(Sort.Direction.ASC, "leaveFrom"));
+        return leaveRequestRepository.findAll();
     }
     
     @Override
-    public List<LeaveRequest> getAllLeaveRequestsInWaiting()
+    public Page<LeaveRequest> getAllLeaveRequests(Pageable pageable)
     {
-        return leaveRequestRepository.findAllByStatusLike(Status.WAITINGAPPROVAL, new Sort(Sort.Direction.ASC, "leaveFrom"));
+        return leaveRequestRepository.findAll(pageable);
+    }
+    
+    @Override
+    public List<LeaveRequest> getAllLeaveRequestsByStatus(String status, Sort sort)
+    {
+        return leaveRequestRepository.findAllByStatusLike(status, sort);
     }
     
     @Override
     public List<LeaveRequest> getAllLeaveRequestsByPersonId(long personId)
     {
-        return leaveRequestRepository.findAllByPersonIdOrderByStatusAscLeaveFromAsc(personId);
+        return leaveRequestRepository.findAllByPersonId(personId);
     }
     
     @Override
@@ -80,5 +96,11 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
             leaveRequest.setApprovalDate(new Date());
             return leaveRequestRepository.save(leaveRequest);
         }
+    }
+    
+    @Override
+    public String[] getAllTypesAbsence()
+    {
+        return TypesAbsence.typesAbsence();
     }
 }
