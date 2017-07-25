@@ -36,6 +36,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
         }
     }
     
+    // Not used
     @Override
     public List<LeaveRequest> getAllLeaveRequests()
     {

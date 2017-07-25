@@ -38,11 +38,9 @@ public class LeaveRequestController
     
     
     @RequestMapping(method = GET, produces = APPLICATION_JSON_VALUE)
-    // public ResponseEntity<List<LeaveRequest>> getAllLeaveRequests()
     public Page<LeaveRequest> getAllLeaveRequests(final Pageable pageable)
     {
         return leaveRequestService.getAllLeaveRequests(pageable);
-        // return new ResponseEntity(leaveRequestService.getAllLeaveRequests(), HttpStatus.OK);
     }
     
     
