@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,17 +45,17 @@ public class LeaveRequestController
     }
     
     
-    @RequestMapping(method = GET, path = "/waiting", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<LeaveRequest>> getAllLeaveRequestsByStatus()
+    @RequestMapping(method = GET, path = "/person/{id}", produces = APPLICATION_JSON_VALUE)
+    public Page<LeaveRequest> getAllLeaveRequestsByPersonId(@PathVariable(value = "id") final long id, final Pageable pageable)
     {
-        return new ResponseEntity(leaveRequestService.getAllLeaveRequestsByStatus(Status.WAITINGAPPROVAL, new Sort(Sort.Direction.ASC, "leaveFrom")), HttpStatus.OK);
+        return leaveRequestService.getAllLeaveRequestsByPersonId(id, pageable);
     }
     
     
-    @RequestMapping(method = GET, path = "/person/{id}", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<LeaveRequest>> getAllLeaveRequestsByPersonId(@PathVariable(value = "id") final long id)
+    @RequestMapping(method = GET, path = "/waiting", produces = APPLICATION_JSON_VALUE)
+    public Page<LeaveRequest> getAllLeaveRequestsByStatus(final Pageable pageable)
     {
-        return new ResponseEntity(leaveRequestService.getAllLeaveRequestsByPersonId(id), HttpStatus.OK);
+        return leaveRequestService.getAllLeaveRequestsByStatus(Status.WAITINGAPPROVAL, pageable);
     }
     
     
@@ -77,7 +78,6 @@ public class LeaveRequestController
     {
         return new ResponseEntity(leaveRequestService.updateLeaveRequestRejected(id), HttpStatus.OK);
     }
-    
     
     @RequestMapping(method = GET, path = "/typesabsence", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String[]> getAllTypesAbsence()

@@ -7,23 +7,20 @@ import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseOperation;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
-import javafx.application.Application;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 
-import java.lang.invoke.LambdaConversionException;
 import java.util.Date;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 @TestExecutionListeners({DbUnitTestExecutionListener.class})
 @SpringBootTest(classes = LeaverequestprojectApplication.class)
@@ -39,32 +36,30 @@ public class LeaveRequestRepositoryTest extends AbstractTransactionalJUnit4Sprin
     @Test
     public void findAll() throws Exception
     {
-        List<LeaveRequest> all = leaveRequestRepository.findAll(new Sort(Sort.Direction.ASC, "leaveFrom"));
-        Assert.assertEquals(all.size(), 5);
-        Assert.assertTrue("First date (" + all.get(0).getLeaveFrom() + ") should be lower or equals than second (" +
-                all.get(1).getLeaveFrom() + ")", all.get(0).getLeaveFrom().compareTo(all.get(1).getLeaveFrom()) <= 0);
-        Assert.assertTrue("First date (" + all.get(0).getLeaveFrom() + ") should be lower or equals than second (" +
-                all.get(1).getLeaveFrom() + ")", all.get(1).getLeaveFrom().compareTo(all.get(2).getLeaveFrom()) <= 0);
+        Page<LeaveRequest> all = leaveRequestRepository.findAll(new PageRequest(0, 10, Sort.Direction.ASC, "leaveFrom"));
+        Assert.assertEquals(all.getTotalElements(), 5);
+        Assert.assertTrue("First date (" + all.getContent().get(0).getLeaveFrom() + ") should be lower or equals than second ("
+                + all.getContent().get(1).getLeaveFrom() + ")", all.getContent().get(0).getLeaveFrom().compareTo(all.getContent().get(1).getLeaveFrom()) <= 0);
+        Assert.assertTrue("First date (" + all.getContent().get(0).getLeaveFrom() + ") should be lower or equals than second ("
+                + all.getContent().get(1).getLeaveFrom() + ")", all.getContent().get(1).getLeaveFrom().compareTo(all.getContent().get(2).getLeaveFrom()) <= 0);
     }
     
     @Test
     public void findAllByPersonId() throws Exception
     {
-        List<LeaveRequest> all = leaveRequestRepository.findAllByPersonId(1L);
-        Assert.assertEquals(all.size(), 1);
-        Assert.assertEquals(all.get(0).getPersonId(), 1L);
+        Page<LeaveRequest> all = leaveRequestRepository.findAllByPersonId(1L, new PageRequest(0, 10, Sort.Direction.ASC, "leaveFrom"));
+        Assert.assertEquals(all.getTotalElements(), 1);
+        Assert.assertEquals(all.getContent().get(0).getPersonId(), 1L);
     }
     
     @Test
     public void findAllByStatusLike() throws Exception
     {
-        List<LeaveRequest> all = leaveRequestRepository.findAllByStatusLike(Status.WAITINGAPPROVAL, new Sort(Sort.Direction.ASC, "leaveFrom"));
-        Assert.assertEquals(all.size(), 3);
-        Assert.assertEquals(all.get(0).getStatus(), Status.WAITINGAPPROVAL);
-        Assert.assertEquals(all.get(1).getStatus(), Status.WAITINGAPPROVAL);
-        Assert.assertEquals(all.get(2).getStatus(), Status.WAITINGAPPROVAL);
-        Assert.assertTrue("First date (" + all.get(0).getLeaveFrom() + ") should be lower or equals than second (" +
-                all.get(1).getLeaveFrom() + ")", all.get(0).getLeaveFrom().compareTo(all.get(1).getLeaveFrom()) <= 0);
+        Page<LeaveRequest> all = leaveRequestRepository.findAllByStatusLike(Status.WAITINGAPPROVAL, new PageRequest(0, 10));
+        Assert.assertEquals(all.getTotalElements(), 3);
+        Assert.assertEquals(all.getContent().get(0).getStatus(), Status.WAITINGAPPROVAL);
+        Assert.assertEquals(all.getContent().get(1).getStatus(), Status.WAITINGAPPROVAL);
+        Assert.assertEquals(all.getContent().get(2).getStatus(), Status.WAITINGAPPROVAL);
     }
     
     @Test

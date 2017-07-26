@@ -10,17 +10,18 @@ import com.example.leaverequest.repository.LeaveRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+
 import java.util.Date;
 import java.util.List;
 
 @Service
+@PreAuthorize("authenticated")
 public class LeaveRequestServiceImpl implements LeaveRequestService
 {
     @Autowired
     LeaveRequestRepository leaveRequestRepository;
-    
     
     @Override
     public LeaveRequest createLeaveRequest(LeaveRequestDTO dto)
@@ -50,15 +51,15 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
     }
     
     @Override
-    public List<LeaveRequest> getAllLeaveRequestsByStatus(String status, Sort sort)
+    public Page<LeaveRequest> getAllLeaveRequestsByPersonId(long personId, Pageable pageable)
     {
-        return leaveRequestRepository.findAllByStatusLike(status, sort);
+        return leaveRequestRepository.findAllByPersonId(personId, pageable);
     }
     
     @Override
-    public List<LeaveRequest> getAllLeaveRequestsByPersonId(long personId)
+    public Page<LeaveRequest> getAllLeaveRequestsByStatus(String status, Pageable pageable)
     {
-        return leaveRequestRepository.findAllByPersonId(personId);
+        return leaveRequestRepository.findAllByStatusLike(status, pageable);
     }
     
     @Override

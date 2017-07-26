@@ -4,7 +4,7 @@ import com.example.leaverequest.dto.LeaveRequestDTO;
 import com.example.leaverequest.model.LeaveRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -16,9 +16,9 @@ public interface LeaveRequestService
     
     Page<LeaveRequest> getAllLeaveRequests(Pageable pageable);
     
-    List<LeaveRequest> getAllLeaveRequestsByStatus(String status, Sort sort);
+    Page<LeaveRequest> getAllLeaveRequestsByPersonId(long personId, Pageable pageable);
     
-    List<LeaveRequest> getAllLeaveRequestsByPersonId(long personId);
+    Page<LeaveRequest> getAllLeaveRequestsByStatus(String status, Pageable pageable);
     
     LeaveRequest getLeaveRequestById(long id);
     

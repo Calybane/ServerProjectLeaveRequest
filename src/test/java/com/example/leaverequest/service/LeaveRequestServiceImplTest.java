@@ -11,9 +11,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -33,8 +35,7 @@ public class LeaveRequestServiceImplTest
     public void createLeaveRequest() {
         //Given
         LeaveRequest returnedLeaveRequest = Mockito.mock(LeaveRequest.class);
-        LeaveRequestDTO dto = new LeaveRequestDTO(1L, "Annual leave", new Date(), new Date(), 1, new Date(), null,
-                "Waiting for approval");
+        LeaveRequestDTO dto = new LeaveRequestDTO(1L, "Annual leave", new Date(), new Date(), 1, new Date(), null, "Waiting for approval");
         Mockito.when(leaveRequestRepository.save(any(LeaveRequest.class))).thenReturn(returnedLeaveRequest);
         
         //When
@@ -48,29 +49,56 @@ public class LeaveRequestServiceImplTest
     public void getAllLeaveRequests() {
         //Given
         LeaveRequest leaveRequest = Mockito.mock(LeaveRequest.class);
-        Mockito.when(leaveRequestRepository.findAll(new Sort(Sort.Direction.ASC, "leaveFrom"))).thenReturn(Arrays.asList(leaveRequest));
+        
+        List<LeaveRequest> leaveRequests = new ArrayList<>();
+        leaveRequests.add(leaveRequest);
+        Mockito.when(leaveRequestRepository.findAll(new PageRequest(0, 10)))
+                .thenReturn(new PageImpl<>(leaveRequests, new PageRequest(0,10), 100));
     
         //When
-        List<LeaveRequest> allLeaveRequests = classUnderTest.getAllLeaveRequests();
+        Page<LeaveRequest> allLeaveRequests = classUnderTest.getAllLeaveRequests(new PageRequest(0, 10));
     
         //Then
-        assertEquals(allLeaveRequests.size(), 0);
-        // assertEquals(allLeaveRequests.get(0), leaveRequest);
+        assertEquals(allLeaveRequests.getTotalElements(), 100);
+        assertEquals(allLeaveRequests.getSize(), 10);
+        assertEquals(allLeaveRequests.getContent().get(0), leaveRequest);
+    }
+    
+    @Test
+    public void getAllLeaveRequestsByPersonId() {
+        //Given
+        LeaveRequest leaveRequest = Mockito.mock(LeaveRequest.class);
+        
+        List<LeaveRequest> leaveRequests = new ArrayList<>();
+        leaveRequests.add(leaveRequest);
+        Mockito.when(leaveRequestRepository.findAllByPersonId(1L, new PageRequest(0, 10)))
+                .thenReturn(new PageImpl<>(leaveRequests, new PageRequest(0,10), 100));
+        
+        //When
+        Page<LeaveRequest> allLeaveRequests = classUnderTest.getAllLeaveRequestsByPersonId(1L, new PageRequest(0, 10));
+        
+        //Then
+        assertEquals(allLeaveRequests.getTotalElements(), 100);
+        assertEquals(allLeaveRequests.getSize(), 10);
+        assertEquals(allLeaveRequests.getContent().get(0), leaveRequest);
     }
     
     @Test
     public void getAllLeaveRequestsBystatus() {
         //Given
         LeaveRequest leaveRequest = Mockito.mock(LeaveRequest.class);
-        Mockito.when(leaveRequestRepository.findAllByStatusLike(Status.WAITINGAPPROVAL, new Sort(Sort.Direction.ASC, "leaveFrom")))
-                .thenReturn(Arrays.asList(leaveRequest));
+        
+        List<LeaveRequest> leaveRequests = new ArrayList<>();
+        leaveRequests.add(leaveRequest);
+        Mockito.when(leaveRequestRepository.findAllByStatusLike(Status.WAITINGAPPROVAL, new PageRequest(0, 10))).thenReturn(new PageImpl<>(leaveRequests, new PageRequest(0,10), 100));
         
         //When
-        List<LeaveRequest> allLeaveRequests = classUnderTest.getAllLeaveRequestsByStatus(Status.WAITINGAPPROVAL, new Sort(Sort.Direction.ASC, "leaveFrom"));
+        Page<LeaveRequest> allLeaveRequests = classUnderTest.getAllLeaveRequestsByStatus(Status.WAITINGAPPROVAL, new PageRequest(0, 10));
         
         //Then
-        assertEquals(allLeaveRequests.size(), 1);
-        assertEquals(allLeaveRequests.get(0), leaveRequest);
+        assertEquals(allLeaveRequests.getTotalElements(), 100);
+        assertEquals(allLeaveRequests.getSize(), 10);
+        assertEquals(allLeaveRequests.getContent().get(0), leaveRequest);
     }
     
     @Test
