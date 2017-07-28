@@ -22,9 +22,6 @@ public class Person
     @Column(nullable = false, name = "DAYS_LEFT")
     private Integer daysLeft;
     
-    @Column(nullable = false, name = "ROLE")
-    private String role;
-    
     
     public Person(){}
     
@@ -33,7 +30,6 @@ public class Person
         this.lastname = dto.getLastname();
         this.firstname = dto.getFirstname();
         this.daysLeft = dto.getDaysLeft();
-        this.role = dto.getRole();
     }
     
     
@@ -77,16 +73,6 @@ public class Person
         this.daysLeft = daysLeft;
     }
     
-    public String getRole()
-    {
-        return role;
-    }
-    
-    public void setRole(String role)
-    {
-        this.role = role;
-    }
-    
     @Override
     public String toString()
     {
@@ -95,7 +81,6 @@ public class Person
                 ", lastname='" + lastname + '\'' +
                 ", firstname='" + firstname + '\'' +
                 ", daysLeft=" + daysLeft +
-                ", role='" + role + '\'' +
                 '}';
     }
 }

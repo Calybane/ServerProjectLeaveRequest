@@ -1,8 +1,31 @@
 package com.example.leaverequest.model;
 
-public class Status
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+public enum Status
 {
-    public static final String WAITINGAPPROVAL = "Waiting for approval";
-    public static final String APPROVED = "Approved";
-    public static final String REJECTED = "Rejected";
+    WAITINGAPPROVAL("Waiting for approval"),
+    APPROVEDMANAGER("Approved by manager"),
+    APPROVEDHR("Approved by HR"),
+    REJECTED("Rejected");
+    
+    private String status;
+    
+    private Status(String status)
+    {
+        setStatus(status);
+    }
+    
+    @JsonValue
+    public String getStatus()
+    {
+        return this.status;
+    }
+    
+    @JsonCreator
+    public void setStatus(String status)
+    {
+        this.status = status;
+    }
 }

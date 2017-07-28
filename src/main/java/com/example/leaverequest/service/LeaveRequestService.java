@@ -10,21 +10,36 @@ import java.util.List;
 
 public interface LeaveRequestService
 {
+    @PreAuthorize("isAuthenticated()")
     LeaveRequest createLeaveRequest(LeaveRequestDTO dto);
     
+    @PreAuthorize("isAuthenticated()")
     List<LeaveRequest> getAllLeaveRequests();
     
+    @PreAuthorize("isAuthenticated()")
     Page<LeaveRequest> getAllLeaveRequests(Pageable pageable);
     
+    @PreAuthorize("isAuthenticated()")
     Page<LeaveRequest> getAllLeaveRequestsByPersonId(long personId, Pageable pageable);
     
+    @PreAuthorize("isAuthenticated()")
     Page<LeaveRequest> getAllLeaveRequestsByStatus(String status, Pageable pageable);
     
+    @PreAuthorize("isAuthenticated()")
     LeaveRequest getLeaveRequestById(long id);
     
-    LeaveRequest updateLeaveRequestApproved(long id);
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGER')")
+    LeaveRequest updateLeaveRequestApprovedByManager(long id);
     
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HR')")
+    LeaveRequest updateLeaveRequestApprovedByHR(long id);
+    
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGER') or hasAuthority('HR')")
     LeaveRequest updateLeaveRequestRejected(long id);
     
+    @PreAuthorize("isAuthenticated()")
+    void deleteLeaveRequest(long id);
+    
+    @PreAuthorize("isAuthenticated()")
     String[] getAllTypesAbsence();
 }

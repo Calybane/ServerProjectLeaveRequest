@@ -5,6 +5,7 @@ import com.example.leaverequest.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,5 +36,12 @@ public class PersonController
     public ResponseEntity<PersonDTO> getPersonById(@PathVariable(value = "id") final long id)
     {
         return new ResponseEntity(personService.getPersonById(id), HttpStatus.OK);
+    }
+    
+    
+    @RequestMapping(method = GET, path = "/roles", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<PersonDTO> getRoles()
+    {
+        return new ResponseEntity(SecurityContextHolder.getContext().getAuthentication().getAuthorities(), HttpStatus.OK);
     }
 }

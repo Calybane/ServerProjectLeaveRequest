@@ -19,9 +19,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 
-import java.util.Date;
-import java.util.List;
-
 @TestExecutionListeners({DbUnitTestExecutionListener.class})
 @SpringBootTest(classes = LeaverequestprojectApplication.class)
 @DirtiesContext
@@ -55,24 +52,12 @@ public class LeaveRequestRepositoryTest extends AbstractTransactionalJUnit4Sprin
     @Test
     public void findAllByStatusLike() throws Exception
     {
-        Page<LeaveRequest> all = leaveRequestRepository.findAllByStatusLike(Status.WAITINGAPPROVAL, new PageRequest(0, 10));
+        Page<LeaveRequest> all = leaveRequestRepository.findAllByStatusLike(Status.WAITINGAPPROVAL.getStatus(), new PageRequest
+                (0, 10));
         Assert.assertEquals(all.getTotalElements(), 3);
-        Assert.assertEquals(all.getContent().get(0).getStatus(), Status.WAITINGAPPROVAL);
-        Assert.assertEquals(all.getContent().get(1).getStatus(), Status.WAITINGAPPROVAL);
-        Assert.assertEquals(all.getContent().get(2).getStatus(), Status.WAITINGAPPROVAL);
-    }
-    
-    @Test
-    public void findAllByStatusLikeAndLeaveFromAfter() throws Exception
-    {
-        List<LeaveRequest> all = leaveRequestRepository.findAllByStatusLikeAndLeaveFromAfter(Status.WAITINGAPPROVAL, new Date(), new Sort(Sort.Direction.ASC, "leaveFrom"));
-        Assert.assertEquals(all.size(), 2);
-        Assert.assertEquals(all.get(0).getStatus(), Status.WAITINGAPPROVAL);
-        Assert.assertEquals(all.get(1).getStatus(), Status.WAITINGAPPROVAL);
-        Assert.assertTrue("First date (" + all.get(0).getLeaveFrom() + ") should be greather than today (" +
-                new Date() + ")", all.get(0).getLeaveFrom().after(new Date()));
-        Assert.assertTrue("First date (" + all.get(0).getLeaveFrom() + ") should be lower or equals than second (" +
-                all.get(1).getLeaveFrom() + ")", all.get(0).getLeaveFrom().compareTo(all.get(1).getLeaveFrom()) <= 0);
+        Assert.assertEquals(all.getContent().get(0).getStatus(), Status.WAITINGAPPROVAL.getStatus());
+        Assert.assertEquals(all.getContent().get(1).getStatus(), Status.WAITINGAPPROVAL.getStatus());
+        Assert.assertEquals(all.getContent().get(2).getStatus(), Status.WAITINGAPPROVAL.getStatus());
     }
     
 }

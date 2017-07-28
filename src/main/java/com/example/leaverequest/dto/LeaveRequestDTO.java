@@ -34,7 +34,9 @@ public class LeaveRequestDTO
     @NotNull
     private final Date requestDate;
     
-    private final Date approvalDate;
+    private final Date approvalManagerDate;
+    
+    private final Date approvalHRDate;
     
     @NotNull
     private final String status;
@@ -47,7 +49,8 @@ public class LeaveRequestDTO
             @JsonProperty("leaveTo") Date leaveTo,
             @JsonProperty("daysTaken") int daysTaken,
             @JsonProperty("requestDate") Date requestDate,
-            @JsonProperty("approvalDate") Date approvalDate,
+            @JsonProperty("approvalManagerDate") Date approvalManagerDate,
+            @JsonProperty("approvalHRDate") Date approvalHRDate,
             @JsonProperty("status") String status) {
         this.personId = personId;
         this.typeAbsence = typeAbsence;
@@ -55,7 +58,8 @@ public class LeaveRequestDTO
         this.leaveTo = leaveTo;
         this.daysTaken = daysTaken;
         this.requestDate = requestDate;
-        this.approvalDate = approvalDate;
+        this.approvalManagerDate = approvalManagerDate;
+        this.approvalHRDate = approvalHRDate;
         this.status = status;
     }
     
@@ -99,9 +103,14 @@ public class LeaveRequestDTO
         return requestDate;
     }
     
-    public Date getApprovalDate()
+    public Date getApprovalManagerDate()
     {
-        return approvalDate;
+        return approvalManagerDate;
+    }
+    
+    public Date getApprovalHRDate()
+    {
+        return approvalHRDate;
     }
     
     public String getStatus()
@@ -120,7 +129,8 @@ public class LeaveRequestDTO
                 ", leaveTo=" + leaveTo +
                 ", daysTaken=" + daysTaken +
                 ", requestDate=" + requestDate +
-                ", approvalDate=" + approvalDate +
+                ", approvalManagerDate=" + approvalManagerDate +
+                ", approvalHRDate=" + approvalHRDate +
                 ", status='" + status + '\'' +
                 '}';
     }

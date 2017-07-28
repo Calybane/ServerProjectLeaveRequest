@@ -22,20 +22,14 @@ public class PersonDTO
     @Min(0)
     private final Integer daysLeft;
     
-    @NotBlank
-    @Size(max = 255)
-    private String role;
-    
     @JsonCreator
     public PersonDTO(
             @JsonProperty("lastname") String lastname,
             @JsonProperty("firstname") String firstname,
-            @JsonProperty("daysLeft") Integer daysLeft,
-            @JsonProperty("role") String role) {
+            @JsonProperty("daysLeft") Integer daysLeft) {
         this.lastname = lastname;
         this.firstname = firstname;
         this.daysLeft = daysLeft;
-        this.role = role;
     }
     
     public Long getId()
@@ -63,11 +57,6 @@ public class PersonDTO
         return daysLeft;
     }
     
-    public String getRole()
-    {
-        return role;
-    }
-    
     @Override
     public String toString()
     {
@@ -76,7 +65,6 @@ public class PersonDTO
                 ", lastname='" + lastname + '\'' +
                 ", firstname='" + firstname + '\'' +
                 ", daysLeft=" + daysLeft +
-                ", role='" + role + '\'' +
                 '}';
     }
 }
