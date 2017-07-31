@@ -13,7 +13,6 @@ public class LeaveRequest
 {
     @Id
     @Column(nullable = false, name = "ID")
-    /*@Column(nullable = false)*/
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     
@@ -24,30 +23,28 @@ public class LeaveRequest
     private String typeAbsence;
     
     @Column(nullable = false, name = "LEAVE_FROM")
-    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date leaveFrom;
     
     @Column(nullable = false, name = "LEAVE_TO")
-    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date leaveTo;
     
     @Column(nullable = false, name = "DAYS_TAKEN")
     private int daysTaken;
     
     @Column(nullable = false, name = "REQUEST_DATE")
-    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date requestDate;
     
     @Column(name = "APPROVAL_MANAGER_DATE")
-    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date approvalManagerDate;
     
     @Column(name = "APPROVAL_HR_DATE")
-    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date approvalHRDate;
     
     @Column(nullable = false, name = "STATUS")
     private String status;
+    
+    @Column(name = "DESCRIPTION")
+    private String description;
     
     
     public LeaveRequest()
@@ -65,6 +62,7 @@ public class LeaveRequest
         this.approvalManagerDate = dto.getApprovalManagerDate();
         this.approvalHRDate = dto.getApprovalHRDate();
         this.status = dto.getStatus();
+        this.description = dto.getDescription();
     }
     
     
@@ -178,6 +176,17 @@ public class LeaveRequest
         return this;
     }
     
+    public String getDescription()
+    {
+        return description;
+    }
+    
+    public LeaveRequest setDescription(String description)
+    {
+        this.description = description;
+        return this;
+    }
+    
     @Override
     public String toString()
     {
@@ -192,6 +201,7 @@ public class LeaveRequest
                 ", approvalManagerDate=" + approvalManagerDate +
                 ", approvalHRDate=" + approvalHRDate +
                 ", status='" + status + '\'' +
+                ", description='" + description + '\'' +
                 '}';
     }
     
@@ -206,46 +216,4 @@ public class LeaveRequest
         
         return true;
     }
-    
-    /*
-    private String getApproval() {
-        if (this.status.equals("Rejected")) {
-            return "Date of reject : ";
-        } else {
-            return "Date of approval : ";
-        }
-    }
-    
-    public ByteArrayInputStream createPDF(PDFInfo pdfInfo, String filename)
-    {
-        Document document = new Document();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try{
-            PdfWriter pdfWriter = PdfWriter.getInstance(document, out);
-            document.open();
-            PdfFont font = PdfFontFactory.createFont(FontConstants.TIMES_ROMAN);
-            Paragraph title = new Paragraph("LEAVE OF ABSENCE - REQUEST FORM");
-            title.setAlignment(Element.ALIGN_CENTER);
-            document.add(title);
-            document.add(Chunk.NEWLINE);
-            
-            document.add(new Paragraph("Employee name : " + pdfInfo.getFirstname() + " " + pdfInfo.getLastname().toUpperCase() ));
-            document.add(new Paragraph("Type of absence : " + this.typeAbsence ));
-            document.add(new Paragraph("Absence date : " ));
-            Paragraph paraph = new Paragraph("From " + this.leaveFrom + "       To " + this.leaveTo );
-            paraph.setIndentationLeft(20);
-            document.add(paraph);
-            document.add(new Paragraph("Number of days taken : " + this.daysTaken ));
-            document.add(new Paragraph("Number of annual leave days left : " + pdfInfo.getDaysLeft() ));
-            document.add(new Paragraph("Request date : " + this.requestDate ));
-            document.add(new Paragraph(getApproval() + (this.approvalDate != null ? (this.approvalDate) : "Waiting for approval") ));
-            
-            document.close();
-        } catch (Exception ex) {
-            Logger.getLogger(LeaveRequest.class.getName()).log(Level.SEVERE, "Error creation leave request pdf.", ex);
-        }
-        
-        return new ByteArrayInputStream(out.toByteArray());
-    }
-    */
 }

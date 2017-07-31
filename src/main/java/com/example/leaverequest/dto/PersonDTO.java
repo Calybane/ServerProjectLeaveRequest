@@ -24,8 +24,8 @@ public class PersonDTO
     
     @JsonCreator
     public PersonDTO(
-            @JsonProperty("lastname") String lastname,
             @JsonProperty("firstname") String firstname,
+            @JsonProperty("lastname") String lastname,
             @JsonProperty("daysLeft") Integer daysLeft) {
         this.lastname = lastname;
         this.firstname = firstname;

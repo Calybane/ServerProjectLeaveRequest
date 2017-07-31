@@ -49,7 +49,8 @@ public class LeaveRequestServiceImplTest
     public void createLeaveRequest() {
         //Given
         LeaveRequest returnedLeaveRequest = Mockito.mock(LeaveRequest.class);
-        LeaveRequestDTO dto = new LeaveRequestDTO(1L, "Annual leave", new Date(), new Date(), 1, new Date(), null, null, "Waiting for approval");
+        LeaveRequestDTO dto = new LeaveRequestDTO(1L, "Annual leave", new Date(), new Date(), 1, new Date(),
+                null, null, Status.WAITINGAPPROVAL.getStatus(), "vacation");
         Mockito.when(leaveRequestRepository.save(any(LeaveRequest.class))).thenReturn(returnedLeaveRequest);
         
         //When

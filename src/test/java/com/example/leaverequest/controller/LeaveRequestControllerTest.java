@@ -72,7 +72,8 @@ public class LeaveRequestControllerTest extends ControllerTest
     @Test
     public void createLeaveRequest() throws Exception
     {
-        LeaveRequestDTO dto = new LeaveRequestDTO(1L, "Annual", new Date(), new Date(), 10, new Date(), new Date(), null, Status.WAITINGAPPROVAL.getStatus());
+        LeaveRequestDTO dto = new LeaveRequestDTO(1L, "Annual", new Date(), new Date(), 10, new Date(), new Date()
+                , null, Status.WAITINGAPPROVAL.getStatus(), "vacation");
         
         mockMvc.perform(post("/api/leaverequest")
                 .accept(MediaType.APPLICATION_JSON)

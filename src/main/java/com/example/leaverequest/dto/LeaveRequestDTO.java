@@ -41,6 +41,8 @@ public class LeaveRequestDTO
     @NotNull
     private final String status;
     
+    private final String description;
+    
     @JsonCreator
     public LeaveRequestDTO(
             @JsonProperty("personId") Long personId,
@@ -51,7 +53,8 @@ public class LeaveRequestDTO
             @JsonProperty("requestDate") Date requestDate,
             @JsonProperty("approvalManagerDate") Date approvalManagerDate,
             @JsonProperty("approvalHRDate") Date approvalHRDate,
-            @JsonProperty("status") String status) {
+            @JsonProperty("status") String status,
+            @JsonProperty("description") String description) {
         this.personId = personId;
         this.typeAbsence = typeAbsence;
         this.leaveFrom = leaveFrom;
@@ -61,6 +64,7 @@ public class LeaveRequestDTO
         this.approvalManagerDate = approvalManagerDate;
         this.approvalHRDate = approvalHRDate;
         this.status = status;
+        this.description = description;
     }
     
     public Long getId()
@@ -118,6 +122,11 @@ public class LeaveRequestDTO
         return status;
     }
     
+    public String getDescription()
+    {
+        return description;
+    }
+    
     @Override
     public String toString()
     {
@@ -132,6 +141,7 @@ public class LeaveRequestDTO
                 ", approvalManagerDate=" + approvalManagerDate +
                 ", approvalHRDate=" + approvalHRDate +
                 ", status='" + status + '\'' +
+                ", description='" + description + '\'' +
                 '}';
     }
 }
