@@ -28,20 +28,37 @@ class TokenAuthenticationService {
         String token = request.getHeader(HEADER_STRING);
         if (token != null) {
             // parse the token.
+            Object obj = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token.replace(TOKEN_PREFIX, "")).getBody();
             String user = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token.replace(TOKEN_PREFIX, "")).getBody().getSubject();
     
-            List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
-            updatedAuthorities.add(new SimpleGrantedAuthority("USER"));
-            if (user.equals("admin"))
+            /*
+             * SET roles here because the app doesn't load them with the WebSecurityConfig
+             */
+            if (user != null)
             {
-                updatedAuthorities.add(new SimpleGrantedAuthority("ADMIN"));
-                updatedAuthorities.add(new SimpleGrantedAuthority("MANAGER"));
-                updatedAuthorities.add(new SimpleGrantedAuthority("HR"));
+                List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
+                updatedAuthorities.add(new SimpleGrantedAuthority("USER"));
+                if (user.equals("manager"))
+                {
+                    updatedAuthorities.add(new SimpleGrantedAuthority("MANAGER"));
+                }
+                if (user.equals("hr"))
+                {
+                    updatedAuthorities.add(new SimpleGrantedAuthority("HR"));
+                }
+                if (user.equals("admin"))
+                {
+                    updatedAuthorities.add(new SimpleGrantedAuthority("ADMIN"));
+                    updatedAuthorities.add(new SimpleGrantedAuthority("MANAGER"));
+                    updatedAuthorities.add(new SimpleGrantedAuthority("HR"));
+                }
+                
+                return new UsernamePasswordAuthenticationToken(user, null, updatedAuthorities);
             }
-            if (user.equals("manager")) updatedAuthorities.add(new SimpleGrantedAuthority("MANAGER"));
-            if (user.equals("hr")) updatedAuthorities.add(new SimpleGrantedAuthority("HR"));
-            
-            return user != null ? new UsernamePasswordAuthenticationToken(user, null, updatedAuthorities) : null;
+            else
+            {
+                return null;
+            }
         }
         return null;
     }
