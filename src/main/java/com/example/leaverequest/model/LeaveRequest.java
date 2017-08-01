@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import javax.persistence.*;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "LEAVE_REQUEST")
@@ -205,14 +206,16 @@ public class LeaveRequest
                 '}';
     }
     
-    public boolean valid()
+    public boolean valid(List<Date> dates)
     {
         // TODO : verify the days taken with the days left of the user, when the users will be taking in count
+        //          by a service
         
         if(this.leaveFrom.after(this.leaveTo)) return false;
         if(this.daysTaken <= 0) return false;
         String[] typesAbsence = TypesAbsence.typesAbsence();
         if(Arrays.stream(typesAbsence).noneMatch(type -> type.equalsIgnoreCase(this.typeAbsence))) return false;
+        if(dates.contains(this.leaveFrom) || dates.contains(this.leaveTo)) return false;
         
         return true;
     }

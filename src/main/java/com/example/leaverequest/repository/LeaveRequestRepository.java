@@ -14,4 +14,8 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
     Page<LeaveRequest> findAllByPersonId(long personId, Pageable pageable);
     
     Page<LeaveRequest> findAllByStatusLike(String status, Pageable pageable);
+    
+    List<LeaveRequest> findAllByPersonIdAndLeaveFromIsAfter(long id, Date date);
+    
+    List<LeaveRequest> findAllByStatusNotLike(String status);
 }

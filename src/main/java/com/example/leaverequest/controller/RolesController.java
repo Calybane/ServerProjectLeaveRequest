@@ -33,7 +33,8 @@ public class RolesController
             {
                 authorities.add(auth.getAuthority());
             }
-            str = "\"" + String.join(", ", authorities) + "\"";
+            str = "{\"username\":\"" + SecurityContextHolder.getContext().getAuthentication().getName() + "\", " +
+                    "\"role\":\"" + String.join(", ", authorities) + "\"}";
         } catch (Exception ex) {
             System.out.println("Error authorities : " + ex.getMessage());
         }

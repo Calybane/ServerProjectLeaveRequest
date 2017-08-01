@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+import java.util.Date;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -29,22 +30,28 @@ public class LeaveRequestController
     LeaveRequestService leaveRequestService;
     
     
-    @RequestMapping(method = GET, path = "/views", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<LeaveRequest> getAllLeaveRequestsViews()
-    {
-        return new ResponseEntity(leaveRequestService.getAllLeaveRequests(), HttpStatus.OK);
-    }
-    
     @RequestMapping(method = GET, produces = APPLICATION_JSON_VALUE)
     public Page<LeaveRequest> getAllLeaveRequests(final Pageable pageable)
     {
         return leaveRequestService.getAllLeaveRequests(pageable);
     }
     
+    @RequestMapping(method = GET, path = "/views", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<LeaveRequest> getAllLeaveRequestsViews()
+    {
+        return new ResponseEntity(leaveRequestService.getAllLeaveRequestsNotRejected(), HttpStatus.OK);
+    }
+    
     @RequestMapping(method = GET, path = "/person/{id}", produces = APPLICATION_JSON_VALUE)
     public Page<LeaveRequest> getAllLeaveRequestsByPersonId(@PathVariable(value = "id") final long id, final Pageable pageable)
     {
         return leaveRequestService.getAllLeaveRequestsByPersonId(id, pageable);
+    }
+    
+    @RequestMapping(method = GET, path = "/person/{id}/disableddates", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Date>> getAllDisabledDatesByPersonId(@PathVariable(value = "id") final long id)
+    {
+        return new ResponseEntity(leaveRequestService.getAllDisabledDatesByPersonId(id), HttpStatus.OK);
     }
     
     @RequestMapping(method = GET, path = "/waiting", produces = APPLICATION_JSON_VALUE)

@@ -18,10 +18,16 @@ public interface LeaveRequestService
     List<LeaveRequest> getAllLeaveRequests();
     
     @PreAuthorize("isAuthenticated()")
+    List<LeaveRequest> getAllLeaveRequestsNotRejected();
+    
+    @PreAuthorize("isAuthenticated()")
     Page<LeaveRequest> getAllLeaveRequests(Pageable pageable);
     
     @PreAuthorize("isAuthenticated()")
     Page<LeaveRequest> getAllLeaveRequestsByPersonId(long personId, Pageable pageable);
+    
+    @PreAuthorize("isAuthenticated()")
+    List<Date> getAllDisabledDatesByPersonId(long personId);
     
     @PreAuthorize("isAuthenticated()")
     Page<LeaveRequest> getAllLeaveRequestsByStatus(String status, Pageable pageable);
