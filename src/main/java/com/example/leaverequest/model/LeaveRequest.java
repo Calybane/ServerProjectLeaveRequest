@@ -44,6 +44,9 @@ public class LeaveRequest
     @Column(nullable = false, name = "STATUS")
     private String status;
     
+    @Column(nullable = false, name = "AUTHOR")
+    private String author;
+    
     @Column(name = "DESCRIPTION")
     private String description;
     
@@ -63,6 +66,7 @@ public class LeaveRequest
         this.approvalManagerDate = dto.getApprovalManagerDate();
         this.approvalHRDate = dto.getApprovalHRDate();
         this.status = dto.getStatus();
+        this.author = dto.getAuthor();
         this.description = dto.getDescription();
     }
     
@@ -177,6 +181,16 @@ public class LeaveRequest
         return this;
     }
     
+    public String getAuthor()
+    {
+        return author;
+    }
+    
+    public void setAuthor(String author)
+    {
+        this.author = author;
+    }
+    
     public String getDescription()
     {
         return description;
@@ -202,6 +216,7 @@ public class LeaveRequest
                 ", approvalManagerDate=" + approvalManagerDate +
                 ", approvalHRDate=" + approvalHRDate +
                 ", status='" + status + '\'' +
+                ", author='" + author + '\'' +
                 ", description='" + description + '\'' +
                 '}';
     }
@@ -213,6 +228,7 @@ public class LeaveRequest
         
         if(this.leaveFrom.after(this.leaveTo)) return false;
         if(this.daysTaken <= 0) return false;
+        if(!this.status.equals(Status.WAITINGAPPROVAL.getStatus())) return false;
         String[] typesAbsence = TypesAbsence.typesAbsence();
         if(Arrays.stream(typesAbsence).noneMatch(type -> type.equalsIgnoreCase(this.typeAbsence))) return false;
         if(dates.contains(this.leaveFrom) || dates.contains(this.leaveTo)) return false;

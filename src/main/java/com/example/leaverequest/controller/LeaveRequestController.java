@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-
 import java.util.Date;
 import java.util.List;
 
@@ -98,7 +97,7 @@ public class LeaveRequestController
     }
     
     @RequestMapping(method = DELETE, path = "/{id}")
-    public ResponseEntity<LeaveRequest> deleteLeaveRequest(@PathVariable("id") final long id)
+    public ResponseEntity deleteLeaveRequest(@PathVariable("id") final long id)
     {
         leaveRequestService.deleteLeaveRequest(id);
         return new ResponseEntity(HttpStatus.OK);

@@ -5,6 +5,7 @@ import com.example.leaverequest.model.LeaveRequest;
 import com.example.leaverequest.model.Status;
 import com.example.leaverequest.model.TypesAbsence;
 import com.example.leaverequest.service.LeaveRequestService;
+import org.assertj.core.internal.Dates;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -70,25 +72,6 @@ public class LeaveRequestControllerTest extends ControllerTest
     }
     
     @Test
-    public void createLeaveRequest() throws Exception
-    {
-        LeaveRequestDTO dto = new LeaveRequestDTO(1L, "Annual", new Date(), new Date(), 10, new Date(), new Date()
-                , null, Status.WAITINGAPPROVAL.getStatus(), "vacation");
-        
-        mockMvc.perform(post("/api/leaverequest")
-                .accept(MediaType.APPLICATION_JSON)
-                .content(convertObjectToJsonBytes(dto))
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
-    
-        Mockito.verify(leaveRequestService).createLeaveRequest(dtoCaptor.capture());
-        Mockito.verifyNoMoreInteractions(leaveRequestService);
-        
-        LeaveRequestDTO value = dtoCaptor.getValue();
-        assertEquals(value.getPersonId(), 1L);
-    }
-    
-    @Test
     public void getAllLeaveRequests() throws Exception
     {
         //Given
@@ -106,7 +89,61 @@ public class LeaveRequestControllerTest extends ControllerTest
     }
     
     @Test
-    public void getAllLeaveRequestsByStatus() throws Exception
+    public void getAllLeaveRequestsViews() throws Exception
+    {
+        List<LeaveRequest> leaveRequests = new ArrayList<>();
+        leaveRequests.add(new LeaveRequest().setStatus(Status.WAITINGAPPROVAL.getStatus()).setId(2L));
+        leaveRequests.add(new LeaveRequest().setStatus(Status.APPROVEDMANAGER.getStatus()).setId(3L));
+        Mockito.when(leaveRequestService.getAllLeaveRequestsNotRejected()).thenReturn(leaveRequests);
+        
+        mockMvc.perform(get("/api/leaverequest/views"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].status", is(Status.WAITINGAPPROVAL.getStatus())))
+                .andExpect(jsonPath("$[1].status", is(Status.APPROVEDMANAGER.getStatus())))
+                .andExpect(jsonPath("$.size()", is(2)));
+    }
+    
+    @Test
+    public void getAllLeaveRequestsByPersonId() throws Exception
+    {
+        //Given
+        List<LeaveRequest> leaveRequests = new ArrayList<>();
+        leaveRequests.add(new LeaveRequest().setStatus(Status.APPROVEDMANAGER.getStatus()).setPersonId(2L));
+        leaveRequests.add(new LeaveRequest().setStatus(Status.REJECTED.getStatus()).setPersonId(2L));
+        Mockito.when(leaveRequestService.getAllLeaveRequestsByPersonId(2L, new PageRequest(0, 10)))
+                .thenReturn(new PageImpl<LeaveRequest>(leaveRequests, new PageRequest(0,10), 100));
+        
+        mockMvc.perform(get("/api/leaverequest/person/2").param("page","0").param("size","10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("content.size()", is(2)))
+                .andExpect(jsonPath("size", is(10)))
+                .andExpect(jsonPath("content[0].status", is(Status.APPROVEDMANAGER.getStatus())))
+                .andExpect(jsonPath("content[0].personId", is(2)))
+                .andExpect(jsonPath("content[1].status", is(Status.REJECTED.getStatus())))
+                .andExpect(jsonPath("content[1].personId", is(2)));
+    }
+    
+    @Test
+    public void getAllDisabledDatesByPersonId() throws Exception
+    {
+        //GivenCalendar
+        Calendar c = Calendar.getInstance();
+        List<Date> dates = new ArrayList<>();
+        c.set(2017, 7, 31, 0, 0);
+        dates.add(c.getTime());
+        c.set(2017, 8, 1, 0, 0);
+        dates.add(c.getTime());
+        c.set(2017, 8, 2, 0, 0);
+        dates.add(c.getTime());
+        Mockito.when(leaveRequestService.getAllDisabledDatesByPersonId(2L)).thenReturn(dates);
+    
+        mockMvc.perform(get("/api/leaverequest/person/2/disableddates"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", is(3)));
+    }
+    
+    @Test
+    public void getAllLeaveRequestsByStatusWaiting() throws Exception
     {
         //Given
         List<LeaveRequest> leaveRequests = new ArrayList<>();
@@ -123,23 +160,20 @@ public class LeaveRequestControllerTest extends ControllerTest
     }
     
     @Test
-    public void getAllLeaveRequestsByPersonId() throws Exception
+    public void getAllLeaveRequestsByStatusApprovedByManager() throws Exception
     {
         //Given
         List<LeaveRequest> leaveRequests = new ArrayList<>();
-        leaveRequests.add(new LeaveRequest().setStatus(Status.APPROVEDMANAGER.getStatus()).setPersonId(2L));
-        leaveRequests.add(new LeaveRequest().setStatus(Status.REJECTED.getStatus()).setPersonId(2L));
-        Mockito.when(leaveRequestService.getAllLeaveRequestsByPersonId(2L, new PageRequest(0, 10)))
+        leaveRequests.add(new LeaveRequest().setStatus(Status.APPROVEDMANAGER.getStatus()).setId(2L));
+        Mockito.when(leaveRequestService.getAllLeaveRequestsByStatus(Status.APPROVEDMANAGER.getStatus(), new PageRequest(0,10)))
                 .thenReturn(new PageImpl<LeaveRequest>(leaveRequests, new PageRequest(0,10), 100));
-    
-        mockMvc.perform(get("/api/leaverequest/person/2").param("page","0").param("size","10"))
+        
+        mockMvc.perform(get("/api/leaverequest/approvedmanager").param("page","0").param("size","10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("content.size()", is(2)))
+                .andExpect(jsonPath("content.size()", is(1)))
                 .andExpect(jsonPath("size", is(10)))
                 .andExpect(jsonPath("content[0].status", is(Status.APPROVEDMANAGER.getStatus())))
-                .andExpect(jsonPath("content[0].personId", is(2)))
-                .andExpect(jsonPath("content[1].status", is(Status.REJECTED.getStatus())))
-                .andExpect(jsonPath("content[1].personId", is(2)));
+                .andExpect(jsonPath("content[0].id", is(2)));
     }
     
     @Test
@@ -155,7 +189,26 @@ public class LeaveRequestControllerTest extends ControllerTest
     }
     
     @Test
-    public void updateLeaveRequestStatusApproved() throws Exception
+    public void createLeaveRequest() throws Exception
+    {
+        LeaveRequestDTO dto = new LeaveRequestDTO(1L, 1L, "Annual leave", new Date(), new Date(), 10, new Date(),
+                new Date(), null, Status.WAITINGAPPROVAL.getStatus(), "John Doe", "vacation");
+        
+        mockMvc.perform(post("/api/leaverequest")
+                .accept(MediaType.APPLICATION_JSON)
+                .content(convertObjectToJsonBytes(dto))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        
+        Mockito.verify(leaveRequestService).createLeaveRequest(dtoCaptor.capture());
+        Mockito.verifyNoMoreInteractions(leaveRequestService);
+        
+        LeaveRequestDTO value = dtoCaptor.getValue();
+        assertEquals(value.getPersonId(), 1L);
+    }
+    
+    @Test
+    public void updateLeaveRequestStatusApprovedByManager() throws Exception
     {
         //Given
         LeaveRequest returnedLeaveRequest = new LeaveRequest().setId(1L).setStatus(Status.APPROVEDMANAGER.getStatus());
@@ -164,6 +217,18 @@ public class LeaveRequestControllerTest extends ControllerTest
         mockMvc.perform(put("/api/leaverequest/1/changestatus/approved/manager"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status", is(Status.APPROVEDMANAGER.getStatus())));
+    }
+    
+    @Test
+    public void updateLeaveRequestStatusApprovedByHr() throws Exception
+    {
+        //Given
+        LeaveRequest returnedLeaveRequest = new LeaveRequest().setId(1L).setStatus(Status.APPROVEDHR.getStatus());
+        Mockito.when(leaveRequestService.updateLeaveRequestApprovedByHR(1L)).thenReturn(returnedLeaveRequest);
+        
+        mockMvc.perform(put("/api/leaverequest/1/changestatus/approved/hr"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(Status.APPROVEDHR.getStatus())));
     }
     
     @Test
@@ -179,6 +244,12 @@ public class LeaveRequestControllerTest extends ControllerTest
     }
     
     @Test
+    public void deleteLeaveRequest() throws Exception
+    {
+        // TODO
+    }
+    
+    @Test
     public void  getAllTypesAbsence() throws Exception
     {
         //Given
@@ -191,7 +262,7 @@ public class LeaveRequestControllerTest extends ControllerTest
     }
     
     @Test
-    @WithMockUser(username = "user", authorities = "ADMIN")
+    @WithMockUser(username = "user", authorities = "USER")
     public void testSecurity() throws Exception
     {
         //Given
