@@ -15,8 +15,9 @@ public class LeaveRequestDTO
 {
     private Long id;
     
-    @Min(1)
-    private final Long personId;
+    @NotBlank
+    @Size(max = 255)
+    private final String login;
     
     @NotBlank
     @Size(max = 100)
@@ -41,15 +42,12 @@ public class LeaveRequestDTO
     @NotNull
     private final String status;
     
-    @NotNull
-    private final String author;
-    
     private final String description;
     
     @JsonCreator
     public LeaveRequestDTO(
             @JsonProperty("id") Long id,
-            @JsonProperty("personId") Long personId,
+            @JsonProperty("login") String login,
             @JsonProperty("typeAbsence") String typeAbsence,
             @JsonProperty("leaveFrom") Date leaveFrom,
             @JsonProperty("leaveTo") Date leaveTo,
@@ -58,10 +56,9 @@ public class LeaveRequestDTO
             @JsonProperty("approvalManagerDate") Date approvalManagerDate,
             @JsonProperty("approvalHRDate") Date approvalHRDate,
             @JsonProperty("status") String status,
-            @JsonProperty("author") String author,
             @JsonProperty("description") String description) {
         if(id != null) this.id = id;
-        this.personId = personId;
+        this.login = login;
         this.typeAbsence = typeAbsence;
         this.leaveFrom = leaveFrom;
         this.leaveTo = leaveTo;
@@ -70,7 +67,6 @@ public class LeaveRequestDTO
         this.approvalManagerDate = approvalManagerDate;
         this.approvalHRDate = approvalHRDate;
         this.status = status;
-        this.author = author;
         this.description = description;
     }
     
@@ -84,9 +80,9 @@ public class LeaveRequestDTO
         this.id = id;
     }
     
-    public long getPersonId()
+    public String getLogin()
     {
-        return personId;
+        return login;
     }
     
     public String getTypeAbsence()
@@ -129,11 +125,6 @@ public class LeaveRequestDTO
         return status;
     }
     
-    public String getAuthor()
-    {
-        return author;
-    }
-    
     public String getDescription()
     {
         return description;
@@ -144,7 +135,7 @@ public class LeaveRequestDTO
     {
         return "LeaveRequestDTO{" +
                 "id=" + id +
-                ", personId=" + personId +
+                ", login='" + login + '\'' +
                 ", typeAbsence='" + typeAbsence + '\'' +
                 ", leaveFrom=" + leaveFrom +
                 ", leaveTo=" + leaveTo +
@@ -153,7 +144,6 @@ public class LeaveRequestDTO
                 ", approvalManagerDate=" + approvalManagerDate +
                 ", approvalHRDate=" + approvalHRDate +
                 ", status='" + status + '\'' +
-                ", author='" + author + '\'' +
                 ", description='" + description + '\'' +
                 '}';
     }

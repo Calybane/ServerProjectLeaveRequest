@@ -93,11 +93,11 @@ public class LeaveRequestServiceImplTest
         
         List<LeaveRequest> leaveRequests = new ArrayList<>();
         leaveRequests.add(leaveRequest);
-        Mockito.when(leaveRequestRepository.findAllByPersonId(1L, new PageRequest(0, 10)))
+        Mockito.when(leaveRequestRepository.findAllByLogin("user", new PageRequest(0, 10)))
                 .thenReturn(new PageImpl<>(leaveRequests, new PageRequest(0,10), 100));
         
         //When
-        Page<LeaveRequest> allLeaveRequests = classUnderTest.getAllLeaveRequestsByPersonId(1L, new PageRequest(0, 10));
+        Page<LeaveRequest> allLeaveRequests = classUnderTest.getAllLeaveRequestsByLogin("user", new PageRequest(0, 10));
         
         //Then
         assertEquals(allLeaveRequests.getTotalElements(), 100);
@@ -114,10 +114,11 @@ public class LeaveRequestServiceImplTest
         List<LeaveRequest> leaveRequests = new ArrayList<>();
         leaveRequests.add(leaveRequest);
         
-        Mockito.when(leaveRequestRepository.findAllByPersonIdAndLeaveFromIsAfter(2L, new Date())).thenReturn(leaveRequests);
+        Mockito.when(leaveRequestRepository.findAllByLoginAndLeaveFromIsAfter("user", new Date())).thenReturn
+                (leaveRequests);
         
         //When
-        List<Date> dates = classUnderTest.getAllDisabledDatesByPersonId(2L);
+        List<Date> dates = classUnderTest.getAllDisabledDatesByLogin("user");
         
         //Then
         assertTrue(dates.contains(leaveRequest.getLeaveFrom()) && dates.contains(leaveRequest.getLeaveTo()));
@@ -184,8 +185,8 @@ public class LeaveRequestServiceImplTest
     {
         //Given
         LeaveRequest returnedLeaveRequest = Mockito.mock(LeaveRequest.class);
-        LeaveRequestDTO dto = new LeaveRequestDTO(1L, 1L, "Annual leave", new Date(), new Date(), 1, new Date(),
-                null, null, Status.WAITINGAPPROVAL.getStatus(), "John Doe", "vacation");
+        LeaveRequestDTO dto = new LeaveRequestDTO(1L, "user", "Annual leave", new Date(), new Date(), 1, new Date(),
+                null, null, Status.WAITINGAPPROVAL.getStatus(), "vacation");
         Mockito.when(leaveRequestRepository.save(any(LeaveRequest.class))).thenReturn(returnedLeaveRequest);
         
         //When

@@ -1,7 +1,6 @@
 package com.example.leaverequest.model;
 
 import com.example.leaverequest.dto.LeaveRequestDTO;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
 import java.util.Arrays;
@@ -17,8 +16,8 @@ public class LeaveRequest
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     
-    @Column(nullable = false, name = "PERSON_ID")
-    private long personId;
+    @Column(nullable = false, name = "LOGIN")
+    private String login;
     
     @Column(nullable = false, name = "TYPE_ABSENCE")
     private String typeAbsence;
@@ -44,9 +43,6 @@ public class LeaveRequest
     @Column(nullable = false, name = "STATUS")
     private String status;
     
-    @Column(nullable = false, name = "AUTHOR")
-    private String author;
-    
     @Column(name = "DESCRIPTION")
     private String description;
     
@@ -57,7 +53,7 @@ public class LeaveRequest
     
     public LeaveRequest(LeaveRequestDTO dto)
     {
-        this.personId = dto.getPersonId();
+        this.login = dto.getLogin();
         this.typeAbsence = dto.getTypeAbsence();
         this.leaveFrom = dto.getLeaveFrom();
         this.leaveTo = dto.getLeaveTo();
@@ -66,7 +62,6 @@ public class LeaveRequest
         this.approvalManagerDate = dto.getApprovalManagerDate();
         this.approvalHRDate = dto.getApprovalHRDate();
         this.status = dto.getStatus();
-        this.author = dto.getAuthor();
         this.description = dto.getDescription();
     }
     
@@ -82,14 +77,14 @@ public class LeaveRequest
         return this;
     }
     
-    public long getPersonId()
+    public String getLogin()
     {
-        return personId;
+        return login;
     }
     
-    public LeaveRequest setPersonId(long personId)
+    public LeaveRequest setLogin(String login)
     {
-        this.personId = personId;
+        this.login = login;
         return this;
     }
     
@@ -181,16 +176,6 @@ public class LeaveRequest
         return this;
     }
     
-    public String getAuthor()
-    {
-        return author;
-    }
-    
-    public void setAuthor(String author)
-    {
-        this.author = author;
-    }
-    
     public String getDescription()
     {
         return description;
@@ -207,7 +192,7 @@ public class LeaveRequest
     {
         return "LeaveRequest{" +
                 "id=" + id +
-                ", personId=" + personId +
+                ", login='" + login + '\'' +
                 ", typeAbsence='" + typeAbsence + '\'' +
                 ", leaveFrom=" + leaveFrom +
                 ", leaveTo=" + leaveTo +
@@ -216,22 +201,19 @@ public class LeaveRequest
                 ", approvalManagerDate=" + approvalManagerDate +
                 ", approvalHRDate=" + approvalHRDate +
                 ", status='" + status + '\'' +
-                ", author='" + author + '\'' +
                 ", description='" + description + '\'' +
                 '}';
     }
     
     public boolean valid(List<Date> dates)
     {
-        // TODO : verify the days taken with the days left of the user, when the users will be taking in count
-        //          by a service
-        
+        if(this.login.trim().length() == 0) return false;
         if(this.leaveFrom.after(this.leaveTo)) return false;
         if(this.daysTaken <= 0) return false;
         if(!this.status.equals(Status.WAITINGAPPROVAL.getStatus())) return false;
         String[] typesAbsence = TypesAbsence.typesAbsence();
         if(Arrays.stream(typesAbsence).noneMatch(type -> type.equalsIgnoreCase(this.typeAbsence))) return false;
-        if(dates.contains(this.leaveFrom) || dates.contains(this.leaveTo)) return false;
+        if(!dates.isEmpty() && dates.contains(this.leaveFrom) || dates.contains(this.leaveTo)) return false;
         
         return true;
     }

@@ -18,7 +18,7 @@ public class ConfigurationExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(EntityNotFoundException.class)
     protected ConfigurationException notFound(final Exception exception, final WebRequest request) {
-        logger.warn("Leave request not found, exception sent to client", exception);
+        logger.warn("Entity not found, exception sent to client", exception);
         return newException(exception, request);
     }
     

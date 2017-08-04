@@ -50,20 +50,20 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
     
     @Override
     @PreAuthorize("isAuthenticated()")
-    public Page<LeaveRequest> getAllLeaveRequestsByPersonId(long personId, Pageable pageable)
+    public Page<LeaveRequest> getAllLeaveRequestsByLogin(String login, Pageable pageable)
     {
-        return leaveRequestRepository.findAllByPersonId(personId, pageable);
+        return leaveRequestRepository.findAllByLogin(login, pageable);
     }
     
     @Override
     @PreAuthorize("isAuthenticated()")
-    public List<Date> getAllDisabledDatesByPersonId(long personId)
+    public List<Date> getAllDisabledDatesByLogin(String login)
     {
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
         c.add(Calendar.MONTH, -2);
         
-        List<LeaveRequest> leaveRequests = leaveRequestRepository.findAllByPersonIdAndLeaveFromIsAfter(personId, c.getTime());
+        List<LeaveRequest> leaveRequests = leaveRequestRepository.findAllByLoginAndLeaveFromIsAfter(login, c.getTime());
         List<Date> dates = new ArrayList<>();
         for (LeaveRequest request : leaveRequests) {
             Date start = request.getLeaveFrom();
@@ -75,6 +75,8 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
                 start = c.getTime();
             }
         }
+        
+        dates.sort((d1, d2) -> d1.compareTo(d2));
         return dates;
     }
     
@@ -99,13 +101,15 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
     {
         LeaveRequest leaveRequest = new LeaveRequest(dto);
         leaveRequest.setStatus(Status.WAITINGAPPROVAL.getStatus());
-        if (leaveRequest.valid(getAllDisabledDatesByPersonId(leaveRequest.getPersonId())))
-        {
-            return leaveRequestRepository.save(leaveRequest);
-        }
-        else
-        {
+        leaveRequest.setApprovalManagerDate(null);
+        leaveRequest.setApprovalHRDate(null);
+        leaveRequest.setRequestDate(new Date());
+        
+        if (!leaveRequest.valid(getAllDisabledDatesByLogin(leaveRequest.getLogin()))) {
             throw new EntityBadInformationsException("Leave request informations are incorrect");
+        } else {
+            System.out.println("Creating leaverequest : " + leaveRequest.toString());
+            return leaveRequestRepository.save(leaveRequest);
         }
     }
     
@@ -115,14 +119,15 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
     public LeaveRequest updateLeaveRequestApprovedByManager(long id)
     {
         LeaveRequest leaveRequest = leaveRequestRepository.findOne(id);
-        if(leaveRequest == null)
-        {
+        if(leaveRequest == null) {
             throw new EntityNotFoundException("Leave request with id " + id + " not found.");
-        }
-        else
-        {
+        } else if (!leaveRequest.getStatus().equals(Status.WAITINGAPPROVAL.getStatus())) {
+            throw new EntityBadInformationsException("This leave request is not in '" + Status.WAITINGAPPROVAL.getStatus() + "'");
+        } else {
             leaveRequest.setStatus(Status.APPROVEDMANAGER.getStatus());
             leaveRequest.setApprovalManagerDate(new Date());
+            
+            System.out.println("Updating leaverequest : id=" + leaveRequest.getId() + ", status='" + leaveRequest.getStatus() + "'");
             return leaveRequestRepository.save(leaveRequest);
         }
     }
@@ -133,14 +138,15 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
     public LeaveRequest updateLeaveRequestApprovedByHR(long id)
     {
         LeaveRequest leaveRequest = leaveRequestRepository.findOne(id);
-        if(leaveRequest == null)
-        {
-            throw new EntityNotFoundException("Leave request with id " + id + " not found.");
-        }
-        else
-        {
+        if(leaveRequest == null) {
+            throw new EntityNotFoundException("Leave request with id " + id + " not found");
+        } else if (!leaveRequest.getStatus().equals(Status.APPROVEDMANAGER.getStatus())) {
+            throw new EntityBadInformationsException("This leave request is not in '" + Status.APPROVEDMANAGER.getStatus() + "'");
+        } else {
             leaveRequest.setStatus(Status.APPROVEDHR.getStatus());
             leaveRequest.setApprovalHRDate(new Date());
+    
+            System.out.println("Updating leaverequest : id=" + leaveRequest.getId() + ", status='" + leaveRequest.getStatus() + "'");
             return leaveRequestRepository.save(leaveRequest);
         }
     }
@@ -151,15 +157,14 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
     public LeaveRequest updateLeaveRequestRejected(long id)
     {
         LeaveRequest leaveRequest = leaveRequestRepository.findOne(id);
-        if(leaveRequest == null)
-        {
-            throw new EntityNotFoundException("Leave request with id " + id + " not found.");
-        }
-        else
-        {
+        if(leaveRequest == null) {
+            throw new EntityNotFoundException("Leave request with id " + id + " not found");
+        } else {
             leaveRequest.setStatus(Status.REJECTED.getStatus());
             if(leaveRequest.getApprovalManagerDate() == null) leaveRequest.setApprovalManagerDate(new Date());
             else leaveRequest.setApprovalHRDate(new Date());
+    
+            System.out.println("Updating leaverequest : id=" + leaveRequest.getId() + ", status='" + leaveRequest.getStatus() + "'");
             return leaveRequestRepository.save(leaveRequest);
         }
     }
@@ -170,10 +175,13 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
     public void deleteLeaveRequest(long id)
     {
         LeaveRequest leaveRequest = leaveRequestRepository.findOne(id);
-        if (leaveRequest.getStatus().equals(Status.WAITINGAPPROVAL.getStatus())) {
-            leaveRequestRepository.delete(id);
+        if (leaveRequest == null) {
+            throw new EntityNotFoundException("Leave request with id " + id + " not found");
+        } else if (!leaveRequest.getStatus().equals(Status.WAITINGAPPROVAL.getStatus())) {
+            throw new EntityBadInformationsException("This leave request is already in approbation or rejected");
         } else {
-            throw new EntityBadInformationsException("This leave request is already in approbation");
+            System.out.println("Deleting leaverequest : id=" + leaveRequest.getId());
+            leaveRequestRepository.delete(id);
         }
     }
     

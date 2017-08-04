@@ -41,16 +41,17 @@ public class LeaveRequestController
         return new ResponseEntity(leaveRequestService.getAllLeaveRequestsNotRejected(), HttpStatus.OK);
     }
     
-    @RequestMapping(method = GET, path = "/person/{id}", produces = APPLICATION_JSON_VALUE)
-    public Page<LeaveRequest> getAllLeaveRequestsByPersonId(@PathVariable(value = "id") final long id, final Pageable pageable)
+    @RequestMapping(method = GET, path = "/person/{login}", produces = APPLICATION_JSON_VALUE)
+    public Page<LeaveRequest> getAllLeaveRequestsByLogin(@PathVariable(value = "login") final String login, final
+    Pageable pageable)
     {
-        return leaveRequestService.getAllLeaveRequestsByPersonId(id, pageable);
+        return leaveRequestService.getAllLeaveRequestsByLogin(login, pageable);
     }
     
-    @RequestMapping(method = GET, path = "/person/{id}/disableddates", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Date>> getAllDisabledDatesByPersonId(@PathVariable(value = "id") final long id)
+    @RequestMapping(method = GET, path = "/person/{login}/disableddates", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Date>> getAllDisabledDatesByLogin(@PathVariable(value = "login") final String login)
     {
-        return new ResponseEntity(leaveRequestService.getAllDisabledDatesByPersonId(id), HttpStatus.OK);
+        return new ResponseEntity(leaveRequestService.getAllDisabledDatesByLogin(login), HttpStatus.OK);
     }
     
     @RequestMapping(method = GET, path = "/waiting", produces = APPLICATION_JSON_VALUE)
@@ -74,30 +75,29 @@ public class LeaveRequestController
     @RequestMapping(method = POST, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<LeaveRequest> createLeaveRequest(@Valid @RequestBody final LeaveRequestDTO dto)
     {
-        System.out.println("Creating dto : " + dto.toString());
         return new ResponseEntity(leaveRequestService.createLeaveRequest(dto), HttpStatus.CREATED);
     }
     
     @RequestMapping(method = PUT, path = "/{id}/changestatus/approved/manager", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<LeaveRequest> updateLeaveRequestStatusApprovedByManager(@PathVariable("id") final long id)
+    public ResponseEntity<LeaveRequest> updateLeaveRequestStatusApprovedByManager(@PathVariable(value = "id") final long id)
     {
         return new ResponseEntity(leaveRequestService.updateLeaveRequestApprovedByManager(id), HttpStatus.OK);
     }
     
     @RequestMapping(method = PUT, path = "/{id}/changestatus/approved/hr", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<LeaveRequest> updateLeaveRequestStatusApprovedByHr(@PathVariable("id") final long id)
+    public ResponseEntity<LeaveRequest> updateLeaveRequestStatusApprovedByHr(@PathVariable(value = "id") final long id)
     {
         return new ResponseEntity(leaveRequestService.updateLeaveRequestApprovedByHR(id), HttpStatus.OK);
     }
     
     @RequestMapping(method = PUT, path = "/{id}/changestatus/rejected", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<LeaveRequest> updateLeaveRequestStatusRejected(@PathVariable("id") final long id)
+    public ResponseEntity<LeaveRequest> updateLeaveRequestStatusRejected(@PathVariable(value = "id") final long id)
     {
         return new ResponseEntity(leaveRequestService.updateLeaveRequestRejected(id), HttpStatus.OK);
     }
     
     @RequestMapping(method = DELETE, path = "/{id}")
-    public ResponseEntity deleteLeaveRequest(@PathVariable("id") final long id)
+    public ResponseEntity deleteLeaveRequest(@PathVariable(value = "id") final long id)
     {
         leaveRequestService.deleteLeaveRequest(id);
         return new ResponseEntity(HttpStatus.OK);

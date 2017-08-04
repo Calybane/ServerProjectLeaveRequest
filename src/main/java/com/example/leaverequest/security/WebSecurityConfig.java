@@ -118,30 +118,29 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
             .antMatchers("/").permitAll()
             .and()
             // We filter the api/login requests
-            .addFilterBefore(new JWTLoginFilter("/login", authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new JWTLoginFilter("/login", authenticationManager()),
+                    UsernamePasswordAuthenticationFilter.class)
             // And filter other requests to check the presence of JWT in header
             .addFilterBefore(new JWTAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-    
-        
     }
     
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
-                .withUser(userLogin).password(userPassword)
-                    .roles(userRole)
-                    .authorities(userRole)
-                .and()
-                .withUser(managerLogin).password(managerPassword)
-                    .roles(userRole, managerRole)
-                    .authorities(userRole, managerRole)
-                .and()
-                .withUser(hrLogin).password(hrPassword)
-                    .roles(userRole, hrRole)
-                    .authorities(userRole, hrRole)
-                .and()
-                .withUser(adminLogin).password(adminPassword)
-                    .roles(userRole, adminRole, managerRole, hrRole)
-                    .authorities(userRole, adminRole, managerRole, hrRole);
+            .withUser(userLogin).password(userPassword)
+                .roles(userRole)
+                .authorities(userRole)
+            .and()
+            .withUser(managerLogin).password(managerPassword)
+                .roles(userRole, managerRole)
+                .authorities(userRole, managerRole)
+            .and()
+            .withUser(hrLogin).password(hrPassword)
+                .roles(userRole, hrRole)
+                .authorities(userRole, hrRole)
+            .and()
+            .withUser(adminLogin).password(adminPassword)
+                .roles(userRole, adminRole, managerRole, hrRole)
+                .authorities(userRole, adminRole, managerRole, hrRole);
     }
 }

@@ -24,10 +24,10 @@ public interface LeaveRequestService
     Page<LeaveRequest> getAllLeaveRequests(Pageable pageable);
     
     @PreAuthorize("isAuthenticated()")
-    Page<LeaveRequest> getAllLeaveRequestsByPersonId(long personId, Pageable pageable);
+    Page<LeaveRequest> getAllLeaveRequestsByLogin(String login, Pageable pageable);
     
     @PreAuthorize("isAuthenticated()")
-    List<Date> getAllDisabledDatesByPersonId(long personId);
+    List<Date> getAllDisabledDatesByLogin(String login);
     
     @PreAuthorize("isAuthenticated()")
     Page<LeaveRequest> getAllLeaveRequestsByStatus(String status, Pageable pageable);

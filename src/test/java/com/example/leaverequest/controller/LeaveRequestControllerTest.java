@@ -108,9 +108,9 @@ public class LeaveRequestControllerTest extends ControllerTest
     {
         //Given
         List<LeaveRequest> leaveRequests = new ArrayList<>();
-        leaveRequests.add(new LeaveRequest().setStatus(Status.APPROVEDMANAGER.getStatus()).setPersonId(2L));
-        leaveRequests.add(new LeaveRequest().setStatus(Status.REJECTED.getStatus()).setPersonId(2L));
-        Mockito.when(leaveRequestService.getAllLeaveRequestsByPersonId(2L, new PageRequest(0, 10)))
+        leaveRequests.add(new LeaveRequest().setStatus(Status.APPROVEDMANAGER.getStatus()).setLogin("user"));
+        leaveRequests.add(new LeaveRequest().setStatus(Status.REJECTED.getStatus()).setLogin("user"));
+        Mockito.when(leaveRequestService.getAllLeaveRequestsByLogin("login", new PageRequest(0, 10)))
                 .thenReturn(new PageImpl<LeaveRequest>(leaveRequests, new PageRequest(0,10), 100));
         
         mockMvc.perform(get("/api/leaverequest/person/2").param("page","0").param("size","10"))
@@ -118,9 +118,9 @@ public class LeaveRequestControllerTest extends ControllerTest
                 .andExpect(jsonPath("content.size()", is(2)))
                 .andExpect(jsonPath("size", is(10)))
                 .andExpect(jsonPath("content[0].status", is(Status.APPROVEDMANAGER.getStatus())))
-                .andExpect(jsonPath("content[0].personId", is(2)))
+                .andExpect(jsonPath("content[0].login", is("user")))
                 .andExpect(jsonPath("content[1].status", is(Status.REJECTED.getStatus())))
-                .andExpect(jsonPath("content[1].personId", is(2)));
+                .andExpect(jsonPath("content[1].login", is("user")));
     }
     
     @Test
@@ -129,13 +129,13 @@ public class LeaveRequestControllerTest extends ControllerTest
         //GivenCalendar
         Calendar c = Calendar.getInstance();
         List<Date> dates = new ArrayList<>();
-        c.set(2017, 7, 31, 0, 0);
+        c.set(2017, Calendar.JULY, 31, 0, 0);
         dates.add(c.getTime());
-        c.set(2017, 8, 1, 0, 0);
+        c.set(2017, Calendar.AUGUST, 1, 0, 0);
         dates.add(c.getTime());
-        c.set(2017, 8, 2, 0, 0);
+        c.set(2017, Calendar.AUGUST, 2, 0, 0);
         dates.add(c.getTime());
-        Mockito.when(leaveRequestService.getAllDisabledDatesByPersonId(2L)).thenReturn(dates);
+        Mockito.when(leaveRequestService.getAllDisabledDatesByLogin("user")).thenReturn(dates);
     
         mockMvc.perform(get("/api/leaverequest/person/2/disableddates"))
                 .andExpect(status().isOk())
@@ -191,8 +191,9 @@ public class LeaveRequestControllerTest extends ControllerTest
     @Test
     public void createLeaveRequest() throws Exception
     {
-        LeaveRequestDTO dto = new LeaveRequestDTO(1L, 1L, "Annual leave", new Date(), new Date(), 10, new Date(),
-                new Date(), null, Status.WAITINGAPPROVAL.getStatus(), "John Doe", "vacation");
+        LeaveRequestDTO dto = new LeaveRequestDTO(1L, "user", "Annual leave", new Date(),
+                new Date(), 10, new Date(), new Date(), null,
+                Status.WAITINGAPPROVAL.getStatus(),"vacation");
         
         mockMvc.perform(post("/api/leaverequest")
                 .accept(MediaType.APPLICATION_JSON)
@@ -204,7 +205,7 @@ public class LeaveRequestControllerTest extends ControllerTest
         Mockito.verifyNoMoreInteractions(leaveRequestService);
         
         LeaveRequestDTO value = dtoCaptor.getValue();
-        assertEquals(value.getPersonId(), 1L);
+        assertEquals(value.getLogin(), "user");
     }
     
     @Test
