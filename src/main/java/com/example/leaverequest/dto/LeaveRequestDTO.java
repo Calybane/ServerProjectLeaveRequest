@@ -42,6 +42,7 @@ public class LeaveRequestDTO
     @NotNull
     private final String status;
     
+    @Size(max = 255)
     private final String description;
     
     @JsonCreator

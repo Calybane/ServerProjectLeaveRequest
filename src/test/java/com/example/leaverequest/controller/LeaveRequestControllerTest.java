@@ -5,7 +5,6 @@ import com.example.leaverequest.model.LeaveRequest;
 import com.example.leaverequest.model.Status;
 import com.example.leaverequest.model.TypesAbsence;
 import com.example.leaverequest.service.LeaveRequestService;
-import org.assertj.core.internal.Dates;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -104,7 +103,7 @@ public class LeaveRequestControllerTest extends ControllerTest
     }
     
     @Test
-    public void getAllLeaveRequestsByPersonId() throws Exception
+    public void getAllLeaveRequestsByLogin() throws Exception
     {
         //Given
         List<LeaveRequest> leaveRequests = new ArrayList<>();
@@ -124,7 +123,7 @@ public class LeaveRequestControllerTest extends ControllerTest
     }
     
     @Test
-    public void getAllDisabledDatesByPersonId() throws Exception
+    public void getAllDisabledDatesByLogin() throws Exception
     {
         //GivenCalendar
         Calendar c = Calendar.getInstance();
@@ -251,7 +250,7 @@ public class LeaveRequestControllerTest extends ControllerTest
     }
     
     @Test
-    public void  getAllTypesAbsence() throws Exception
+    public void getAllTypesAbsence() throws Exception
     {
         //Given
         String[] types = TypesAbsence.typesAbsence();

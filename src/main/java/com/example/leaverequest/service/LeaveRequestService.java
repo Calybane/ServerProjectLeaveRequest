@@ -12,9 +12,6 @@ import java.util.List;
 public interface LeaveRequestService
 {
     @PreAuthorize("isAuthenticated()")
-    LeaveRequest createLeaveRequest(LeaveRequestDTO dto);
-    
-    @PreAuthorize("isAuthenticated()")
     List<LeaveRequest> getAllLeaveRequests();
     
     @PreAuthorize("isAuthenticated()")
@@ -35,6 +32,9 @@ public interface LeaveRequestService
     @PreAuthorize("isAuthenticated()")
     LeaveRequest getLeaveRequestById(long id);
     
+    @PreAuthorize("isAuthenticated()")
+    LeaveRequest createLeaveRequest(LeaveRequestDTO dto);
+    
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGER')")
     LeaveRequest updateLeaveRequestApprovedByManager(long id);
     
@@ -45,7 +45,7 @@ public interface LeaveRequestService
     LeaveRequest updateLeaveRequestRejected(long id);
     
     @PreAuthorize("isAuthenticated()")
-    void deleteLeaveRequest(long id);
+    boolean deleteLeaveRequest(long id);
     
     @PreAuthorize("isAuthenticated()")
     String[] getAllTypesAbsence();

@@ -14,8 +14,8 @@ import java.util.Date;
 import java.util.List;
 
 class TokenAuthenticationService {
-    static final long EXPIRATIONTIME = 259_200_000; // 3 days
-    static final String SECRET = "ThisIsASecret";
+    static final long EXPIRATIONTIME = 172_800_000; // 2 days
+    static final String SECRET = "ThisIs@Secret";
     static final String TOKEN_PREFIX = "Bearer";
     static final String HEADER_STRING = "Authorization";
     
@@ -32,36 +32,40 @@ class TokenAuthenticationService {
             
             // TODO : catch exception when the token is expired
             
-            // parse the token.
-            user = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token.replace(TOKEN_PREFIX, "")).getBody().getSubject();
+            try {
+                // parse the token.
+                user = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token.replace(TOKEN_PREFIX, "")).getBody().getSubject();
             
             /*
              * SET roles here because the app doesn't load them with the WebSecurityConfig
              */
-            if (user != null)
-            {
-                List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
-                updatedAuthorities.add(new SimpleGrantedAuthority("USER"));
-                if (user.equals("manager"))
+                if (user != null)
                 {
-                    updatedAuthorities.add(new SimpleGrantedAuthority("MANAGER"));
+                    List<GrantedAuthority> updatedAuthorities = new ArrayList<>();
+                    updatedAuthorities.add(new SimpleGrantedAuthority("USER"));
+                    if (user.equals("manager"))
+                    {
+                        updatedAuthorities.add(new SimpleGrantedAuthority("MANAGER"));
+                    }
+                    if (user.equals("hr"))
+                    {
+                        updatedAuthorities.add(new SimpleGrantedAuthority("HR"));
+                    }
+                    if (user.equals("admin"))
+                    {
+                        updatedAuthorities.add(new SimpleGrantedAuthority("ADMIN"));
+                        updatedAuthorities.add(new SimpleGrantedAuthority("MANAGER"));
+                        updatedAuthorities.add(new SimpleGrantedAuthority("HR"));
+                    }
+        
+                    return new UsernamePasswordAuthenticationToken(user, null, updatedAuthorities);
                 }
-                if (user.equals("hr"))
+                else
                 {
-                    updatedAuthorities.add(new SimpleGrantedAuthority("HR"));
+                    return null;
                 }
-                if (user.equals("admin"))
-                {
-                    updatedAuthorities.add(new SimpleGrantedAuthority("ADMIN"));
-                    updatedAuthorities.add(new SimpleGrantedAuthority("MANAGER"));
-                    updatedAuthorities.add(new SimpleGrantedAuthority("HR"));
-                }
-                
-                return new UsernamePasswordAuthenticationToken(user, null, updatedAuthorities);
-            }
-            else
-            {
-                return null;
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
             }
         }
         return null;

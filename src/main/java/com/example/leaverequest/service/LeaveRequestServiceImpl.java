@@ -6,11 +6,15 @@ import com.example.leaverequest.exception.EntityNotFoundException;
 import com.example.leaverequest.model.LeaveRequest;
 import com.example.leaverequest.model.Status;
 import com.example.leaverequest.model.TypesAbsence;
+import com.example.leaverequest.model.User;
+import com.example.leaverequest.repository.HolidayDateRepository;
 import com.example.leaverequest.repository.LeaveRequestRepository;
+import com.example.leaverequest.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +28,12 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
 {
     @Autowired
     LeaveRequestRepository leaveRequestRepository;
+    
+    @Autowired
+    UserRepository userRepository;
+    
+    @Autowired
+    HolidayDateRepository holidayDateRepository;
     
     
     // Not used
@@ -63,7 +73,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
         c.setTime(new Date());
         c.add(Calendar.MONTH, -2);
         
-        List<LeaveRequest> leaveRequests = leaveRequestRepository.findAllByLoginAndLeaveFromIsAfter(login, c.getTime());
+        List<LeaveRequest> leaveRequests = leaveRequestRepository.findAllByLoginAndLeaveFromAfter(login, c.getTime());
         List<Date> dates = new ArrayList<>();
         for (LeaveRequest request : leaveRequests) {
             Date start = request.getLeaveFrom();
@@ -105,10 +115,17 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
         leaveRequest.setApprovalHRDate(null);
         leaveRequest.setRequestDate(new Date());
         
-        if (!leaveRequest.valid(getAllDisabledDatesByLogin(leaveRequest.getLogin()))) {
+        User user = userRepository.findByLogin(leaveRequest.getLogin());
+        
+        if ((user.getDaysLeft() - leaveRequest.getDaysTaken()) < 0) {
+            throw new EntityBadInformationsException("Don't have enough days left");
+        } else if (!leaveRequest.valid(getAllDisabledDatesByLogin(leaveRequest.getLogin()))) {
             throw new EntityBadInformationsException("Leave request informations are incorrect");
         } else {
             System.out.println("Creating leaverequest : " + leaveRequest.toString());
+            int nbHolidays = holidayDateRepository.countAllByDateBetween(leaveRequest.getLeaveFrom(), leaveRequest.getLeaveTo());
+            leaveRequest.setDaysTaken(leaveRequest.getDaysTaken() - nbHolidays);
+            userRepository.save(user.setDaysLeft(user.getDaysLeft() - leaveRequest.getDaysTaken()));
             return leaveRequestRepository.save(leaveRequest);
         }
     }
@@ -123,6 +140,9 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
             throw new EntityNotFoundException("Leave request with id " + id + " not found.");
         } else if (!leaveRequest.getStatus().equals(Status.WAITINGAPPROVAL.getStatus())) {
             throw new EntityBadInformationsException("This leave request is not in '" + Status.WAITINGAPPROVAL.getStatus() + "'");
+        } else if (SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                    .stream().noneMatch(role -> role.getAuthority().toLowerCase().equals("manager"))) {
+            throw new EntityBadInformationsException("The user is not an manager");
         } else {
             leaveRequest.setStatus(Status.APPROVEDMANAGER.getStatus());
             leaveRequest.setApprovalManagerDate(new Date());
@@ -142,6 +162,9 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
             throw new EntityNotFoundException("Leave request with id " + id + " not found");
         } else if (!leaveRequest.getStatus().equals(Status.APPROVEDMANAGER.getStatus())) {
             throw new EntityBadInformationsException("This leave request is not in '" + Status.APPROVEDMANAGER.getStatus() + "'");
+        } else if (SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                    .stream().noneMatch(role -> role.getAuthority().toLowerCase().equals("hr"))) {
+            throw new EntityBadInformationsException("The user is not an HR");
         } else {
             leaveRequest.setStatus(Status.APPROVEDHR.getStatus());
             leaveRequest.setApprovalHRDate(new Date());
@@ -165,6 +188,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
             else leaveRequest.setApprovalHRDate(new Date());
     
             System.out.println("Updating leaverequest : id=" + leaveRequest.getId() + ", status='" + leaveRequest.getStatus() + "'");
+            userRepository.addDays(leaveRequest.getDaysTaken(), leaveRequest.getLogin());
             return leaveRequestRepository.save(leaveRequest);
         }
     }
@@ -172,7 +196,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
     @Override
     @Transactional
     @PreAuthorize("isAuthenticated()")
-    public void deleteLeaveRequest(long id)
+    public boolean deleteLeaveRequest(long id)
     {
         LeaveRequest leaveRequest = leaveRequestRepository.findOne(id);
         if (leaveRequest == null) {
@@ -182,6 +206,8 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
         } else {
             System.out.println("Deleting leaverequest : id=" + leaveRequest.getId());
             leaveRequestRepository.delete(id);
+            userRepository.addDays(leaveRequest.getDaysTaken(), leaveRequest.getLogin());
+            return leaveRequestRepository.findOne(id) == null;
         }
     }
     

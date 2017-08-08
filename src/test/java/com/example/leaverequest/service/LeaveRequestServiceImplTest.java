@@ -27,9 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -114,7 +112,7 @@ public class LeaveRequestServiceImplTest
         List<LeaveRequest> leaveRequests = new ArrayList<>();
         leaveRequests.add(leaveRequest);
         
-        Mockito.when(leaveRequestRepository.findAllByLoginAndLeaveFromIsAfter("user", new Date())).thenReturn
+        Mockito.when(leaveRequestRepository.findAllByLoginAndLeaveFromAfter("user", new Date())).thenReturn
                 (leaveRequests);
         
         //When

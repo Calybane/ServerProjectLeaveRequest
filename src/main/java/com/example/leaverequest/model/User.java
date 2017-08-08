@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table
+@Table(name = "USER")
 public class User
 {
     @Id
@@ -32,9 +32,10 @@ public class User
         return login;
     }
     
-    public void setLogin(String login)
+    public User setLogin(String login)
     {
         this.login = login;
+        return this;
     }
     
     public Integer getDaysLeft()
@@ -42,9 +43,10 @@ public class User
         return daysLeft;
     }
     
-    public void setDaysLeft(Integer daysLeft)
+    public User setDaysLeft(Integer daysLeft)
     {
         this.daysLeft = daysLeft;
+        return this;
     }
     
     public boolean valid()

@@ -97,10 +97,9 @@ public class LeaveRequestController
     }
     
     @RequestMapping(method = DELETE, path = "/{id}")
-    public ResponseEntity deleteLeaveRequest(@PathVariable(value = "id") final long id)
+    public ResponseEntity<Boolean> deleteLeaveRequest(@PathVariable(value = "id") final long id)
     {
-        leaveRequestService.deleteLeaveRequest(id);
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(leaveRequestService.deleteLeaveRequest(id), HttpStatus.OK);
     }
     
     @RequestMapping(method = GET, path = "/typesabsence", produces = APPLICATION_JSON_VALUE)
