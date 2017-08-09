@@ -23,6 +23,7 @@ public class HolidayDate
     public HolidayDate() {}
     
     public HolidayDate(HolidayDateDTO dto) {
+        if (dto.getId() != null) this.id = dto.getId();
         this.date = dto.getDate();
         this.description = dto.getDescription();
     }
@@ -33,9 +34,10 @@ public class HolidayDate
         return id;
     }
     
-    public void setId(long id)
+    public HolidayDate setId(long id)
     {
         this.id = id;
+        return this;
     }
     
     public Date getDate()
@@ -43,9 +45,10 @@ public class HolidayDate
         return date;
     }
     
-    public void setDate(Date date)
+    public HolidayDate setDate(Date date)
     {
         this.date = date;
+        return this;
     }
     
     public String getDescription()

@@ -13,6 +13,4 @@ public interface HolidayDateRepository extends JpaRepository<HolidayDate, Long>
     Page<HolidayDate> findAllByDateIsAfter(Date date, Pageable pageable);
     
     int countAllByDateBetween(@Param("start") Date start, @Param("end") Date end);
-    
-    int countAllByDateEquals(@Param("holiday") Date start);
 }

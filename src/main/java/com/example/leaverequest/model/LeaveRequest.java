@@ -53,6 +53,7 @@ public class LeaveRequest
     
     public LeaveRequest(LeaveRequestDTO dto)
     {
+        if (dto.getId() != null) this.id = dto.getId();
         this.login = dto.getLogin();
         this.typeAbsence = dto.getTypeAbsence();
         this.leaveFrom = dto.getLeaveFrom();
