@@ -47,7 +47,7 @@ public class HolidayDateServiceImpl implements HolidayDateService
     
     @Override
     @Transactional
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HR')")
     public HolidayDate createHolidayDate(HolidayDateDTO dto)
     {
         HolidayDate holiday = new HolidayDate(dto);
@@ -65,7 +65,7 @@ public class HolidayDateServiceImpl implements HolidayDateService
     
     @Override
     @Transactional
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HR')")
     public boolean deleteHolidayDate(long id)
     {
         HolidayDate holiday = holidayDateRepository.findOne(id);
@@ -73,9 +73,9 @@ public class HolidayDateServiceImpl implements HolidayDateService
             throw new EntityNotFoundException("Holiday with id " + id + " not found");
         } else {
             System.out.println("Deleting holiday : " + holiday.toString());
+            holidayDateRepository.delete(id);
             userRepository.removeOneDay(holiday.getDate());
             leaveRequestRepository.addOneDayTaken(holiday.getDate());
-            holidayDateRepository.delete(id);
             return holidayDateRepository.findOne(id) == null;
         }
     }

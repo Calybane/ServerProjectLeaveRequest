@@ -17,9 +17,9 @@ public interface HolidayDateService
     @PreAuthorize("isAuthenticated()")
     Page<HolidayDate> getAllHolidayDatesAfter(Date date, Pageable pageable);
     
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HR')")
     HolidayDate createHolidayDate(HolidayDateDTO dto);
     
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HR')")
     boolean deleteHolidayDate(long id);
 }

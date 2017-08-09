@@ -86,7 +86,6 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
             }
         }
         
-        dates.sort((d1, d2) -> d1.compareTo(d2));
         return dates;
     }
     
