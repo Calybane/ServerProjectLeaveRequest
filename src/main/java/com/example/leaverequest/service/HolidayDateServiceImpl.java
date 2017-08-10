@@ -1,5 +1,6 @@
 package com.example.leaverequest.service;
 
+import com.example.leaverequest.Utils;
 import com.example.leaverequest.dto.HolidayDateDTO;
 import com.example.leaverequest.exception.EntityBadInformationsException;
 import com.example.leaverequest.exception.EntityNotFoundException;
@@ -14,7 +15,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -50,9 +50,10 @@ public class HolidayDateServiceImpl implements HolidayDateService
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HR')")
     public HolidayDate createHolidayDate(HolidayDateDTO dto)
     {
-        HolidayDate holiday = new HolidayDate(dto);
+        HolidayDate holiday = new HolidayDate(dto).setDate(Utils.getZeroTimeDate(dto.getDate()));
+        
         List<HolidayDate> holidayDates = holidayDateRepository.findAll();
-        if (holidayDates.stream().anyMatch(date -> getZeroTimeDate(date.getDate()).compareTo(getZeroTimeDate(dto.getDate())) == 0)) {
+        if (holidayDates.stream().anyMatch(date -> Utils.getZeroTimeDate(date.getDate()).compareTo(Utils.getZeroTimeDate(dto.getDate())) == 0)) {
             throw new EntityBadInformationsException("The holiday already exist");
         } else {
             System.out.println("Creating holiday date: " + holiday.toString());
@@ -78,16 +79,5 @@ public class HolidayDateServiceImpl implements HolidayDateService
             leaveRequestRepository.addOneDayTaken(holiday.getDate());
             return holidayDateRepository.findOne(id) == null;
         }
-    }
-    
-    
-    private static Date getZeroTimeDate(Date date) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        return calendar.getTime();
     }
 }

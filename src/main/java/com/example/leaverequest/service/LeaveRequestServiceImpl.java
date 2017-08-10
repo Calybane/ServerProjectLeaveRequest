@@ -1,5 +1,6 @@
 package com.example.leaverequest.service;
 
+import com.example.leaverequest.Utils;
 import com.example.leaverequest.dto.LeaveRequestDTO;
 import com.example.leaverequest.exception.EntityBadInformationsException;
 import com.example.leaverequest.exception.EntityNotFoundException;
@@ -109,10 +110,26 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
     public LeaveRequest createLeaveRequest(LeaveRequestDTO dto)
     {
         LeaveRequest leaveRequest = new LeaveRequest(dto);
-        leaveRequest.setStatus(Status.WAITINGAPPROVAL.getStatus());
-        leaveRequest.setApprovalManagerDate(null);
-        leaveRequest.setApprovalHRDate(null);
-        leaveRequest.setRequestDate(new Date());
+        leaveRequest.setStatus(Status.WAITINGAPPROVAL.getStatus())
+                .setApprovalManagerDate(null)
+                .setApprovalHRDate(null)
+                .setLeaveFrom(Utils.getZeroTimeDate(leaveRequest.getLeaveFrom()))
+                .setLeaveTo(Utils.getZeroTimeDate(leaveRequest.getLeaveTo()))
+                .setRequestDate(Utils.getZeroTimeDate(new Date()));
+    
+        int nbDays = 0;
+        Calendar c = Calendar.getInstance();
+        Date start = leaveRequest.getLeaveFrom();
+        Date end = leaveRequest.getLeaveTo();
+        while (start.compareTo(end) <= 0) {
+            c.setTime(start);
+            if (c.get(Calendar.DAY_OF_WEEK) >= Calendar.MONDAY && c.get(Calendar.DAY_OF_WEEK) <= Calendar.FRIDAY ) {
+                ++nbDays;
+            }
+            c.add(Calendar.DAY_OF_MONTH, 1);
+            start = c.getTime();
+        }
+        leaveRequest.setDaysTaken(nbDays);
         
         User user = userRepository.findByLogin(leaveRequest.getLogin());
         
