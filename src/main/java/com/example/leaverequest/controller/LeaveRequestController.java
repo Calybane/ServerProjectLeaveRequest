@@ -36,6 +36,12 @@ public class LeaveRequestController
         return new ResponseEntity(leaveRequestService.getAllLeaveRequests(), HttpStatus.OK);
     }
     
+    @RequestMapping(method = GET, path = "/schedule",  produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<LeaveRequest> getAllLeaveRequestsSchedule()
+    {
+        return new ResponseEntity(leaveRequestService.getAllLeaveRequestsNotRejected(), HttpStatus.OK);
+    }
+    
     @RequestMapping(method = GET, path = "/views", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<List<LeaveRequestView>> getAllLeaveRequestsViews()
     {
