@@ -6,8 +6,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum Status
 {
     WAITINGAPPROVAL("Waiting for approval"),
-    APPROVEDMANAGER("Approved by manager"),
-    APPROVEDHR("Approved by HR"),
+    APPROVED("Approved"),
     REJECTED("Rejected");
     
     private String status;

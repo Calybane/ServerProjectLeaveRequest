@@ -19,4 +19,7 @@ public interface UserService
     
     @PreAuthorize("isAuthenticated()")
     User updateUser(UserDTO dto);
+    
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HR')")
+    User addDaysUser(UserDTO dto);
 }

@@ -4,6 +4,7 @@ import com.example.leaverequest.dto.LeaveRequestDTO;
 import com.example.leaverequest.model.LeaveRequest;
 import com.example.leaverequest.model.Status;
 import com.example.leaverequest.service.LeaveRequestService;
+import com.example.leaverequest.view.LeaveRequestView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,15 +31,15 @@ public class LeaveRequestController
     
     
     @RequestMapping(method = GET, produces = APPLICATION_JSON_VALUE)
-    public Page<LeaveRequest> getAllLeaveRequests(final Pageable pageable)
+    public ResponseEntity<LeaveRequest> getAllLeaveRequests()
     {
-        return leaveRequestService.getAllLeaveRequests(pageable);
+        return new ResponseEntity(leaveRequestService.getAllLeaveRequests(), HttpStatus.OK);
     }
     
     @RequestMapping(method = GET, path = "/views", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<LeaveRequest> getAllLeaveRequestsViews()
+    public ResponseEntity<List<LeaveRequestView>> getAllLeaveRequestsViews()
     {
-        return new ResponseEntity(leaveRequestService.getAllLeaveRequestsNotRejected(), HttpStatus.OK);
+        return new ResponseEntity(leaveRequestService.getAllLeaveRequestsView(), HttpStatus.OK);
     }
     
     @RequestMapping(method = GET, path = "/person/{login}", produces = APPLICATION_JSON_VALUE)
@@ -54,16 +55,16 @@ public class LeaveRequestController
         return new ResponseEntity(leaveRequestService.getAllDisabledDatesByLogin(login), HttpStatus.OK);
     }
     
-    @RequestMapping(method = GET, path = "/waiting", produces = APPLICATION_JSON_VALUE)
-    public Page<LeaveRequest> getAllLeaveRequestsByStatusWaiting(final Pageable pageable)
+    @RequestMapping(method = GET, path = "/status/{status}", produces = APPLICATION_JSON_VALUE)
+    public Page<LeaveRequest> getAllLeaveRequestsByStatus(@PathVariable(value = "status") final String status, final Pageable pageable)
     {
-        return leaveRequestService.getAllLeaveRequestsByStatus(Status.WAITINGAPPROVAL.getStatus(), pageable);
-    }
-    
-    @RequestMapping(method = GET, path = "/approvedmanager", produces = APPLICATION_JSON_VALUE)
-    public Page<LeaveRequest> getAllLeaveRequestsByStatusApprovedByManager(final Pageable pageable)
-    {
-        return leaveRequestService.getAllLeaveRequestsByStatus(Status.APPROVEDMANAGER.getStatus(), pageable);
+        if (status.toLowerCase().equals(Status.APPROVED.getStatus().toLowerCase())){
+            return leaveRequestService.getAllLeaveRequestsByStatus(Status.APPROVED.getStatus(), pageable);
+        } if (status.toLowerCase().equals(Status.REJECTED.getStatus().toLowerCase())){
+            return leaveRequestService.getAllLeaveRequestsByStatus(Status.REJECTED.getStatus(), pageable);
+        } else {
+            return leaveRequestService.getAllLeaveRequestsByStatus(Status.WAITINGAPPROVAL.getStatus(), pageable);
+        }
     }
     
     @RequestMapping(method = GET, path = "/{id}", produces = APPLICATION_JSON_VALUE)
@@ -78,16 +79,10 @@ public class LeaveRequestController
         return new ResponseEntity(leaveRequestService.createLeaveRequest(dto), HttpStatus.CREATED);
     }
     
-    @RequestMapping(method = PUT, path = "/{id}/changestatus/approved/manager", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<LeaveRequest> updateLeaveRequestStatusApprovedByManager(@PathVariable(value = "id") final long id)
+    @RequestMapping(method = PUT, path = "/{id}/changestatus/approved", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<LeaveRequest> updateLeaveRequestStatusApproved(@PathVariable(value = "id") final long id)
     {
-        return new ResponseEntity(leaveRequestService.updateLeaveRequestApprovedByManager(id), HttpStatus.OK);
-    }
-    
-    @RequestMapping(method = PUT, path = "/{id}/changestatus/approved/hr", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<LeaveRequest> updateLeaveRequestStatusApprovedByHr(@PathVariable(value = "id") final long id)
-    {
-        return new ResponseEntity(leaveRequestService.updateLeaveRequestApprovedByHR(id), HttpStatus.OK);
+        return new ResponseEntity(leaveRequestService.updateLeaveRequestApproved(id), HttpStatus.OK);
     }
     
     @RequestMapping(method = PUT, path = "/{id}/changestatus/rejected", produces = APPLICATION_JSON_VALUE)

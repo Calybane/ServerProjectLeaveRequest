@@ -71,34 +71,17 @@ public class LeaveRequestControllerTest extends ControllerTest
     }
     
     @Test
-    public void getAllLeaveRequests() throws Exception
-    {
-        //Given
-        List<LeaveRequest> leaveRequests = new ArrayList<>();
-        leaveRequests.add(new LeaveRequest().setStatus(Status.APPROVEDMANAGER.getStatus()).setId(2L));
-        Mockito.when(leaveRequestService.getAllLeaveRequests(new PageRequest(0,10)))
-                .thenReturn(new PageImpl<LeaveRequest>(leaveRequests, new PageRequest(0,10), 100));
-    
-        mockMvc.perform(get("/api/leaverequest").param("page","0").param("size","10"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("content.size()", is(1)))
-                .andExpect(jsonPath("size", is(10)))
-                .andExpect(jsonPath("content[0].status", is(Status.APPROVEDMANAGER.getStatus())))
-                .andExpect(jsonPath("content[0].id", is(2)));
-    }
-    
-    @Test
     public void getAllLeaveRequestsViews() throws Exception
     {
         List<LeaveRequest> leaveRequests = new ArrayList<>();
         leaveRequests.add(new LeaveRequest().setStatus(Status.WAITINGAPPROVAL.getStatus()).setId(2L));
-        leaveRequests.add(new LeaveRequest().setStatus(Status.APPROVEDMANAGER.getStatus()).setId(3L));
+        leaveRequests.add(new LeaveRequest().setStatus(Status.APPROVED.getStatus()).setId(3L));
         Mockito.when(leaveRequestService.getAllLeaveRequestsNotRejected()).thenReturn(leaveRequests);
         
         mockMvc.perform(get("/api/leaverequest/views"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].status", is(Status.WAITINGAPPROVAL.getStatus())))
-                .andExpect(jsonPath("$[1].status", is(Status.APPROVEDMANAGER.getStatus())))
+                .andExpect(jsonPath("$[1].status", is(Status.APPROVED.getStatus())))
                 .andExpect(jsonPath("$.size()", is(2)));
     }
     
@@ -107,16 +90,16 @@ public class LeaveRequestControllerTest extends ControllerTest
     {
         //Given
         List<LeaveRequest> leaveRequests = new ArrayList<>();
-        leaveRequests.add(new LeaveRequest().setStatus(Status.APPROVEDMANAGER.getStatus()).setLogin("user"));
+        leaveRequests.add(new LeaveRequest().setStatus(Status.APPROVED.getStatus()).setLogin("user"));
         leaveRequests.add(new LeaveRequest().setStatus(Status.REJECTED.getStatus()).setLogin("user"));
-        Mockito.when(leaveRequestService.getAllLeaveRequestsByLogin("login", new PageRequest(0, 10)))
+        Mockito.when(leaveRequestService.getAllLeaveRequestsByLogin("user", new PageRequest(0, 10)))
                 .thenReturn(new PageImpl<LeaveRequest>(leaveRequests, new PageRequest(0,10), 100));
         
-        mockMvc.perform(get("/api/leaverequest/person/2").param("page","0").param("size","10"))
+        mockMvc.perform(get("/api/leaverequest/person/user").param("page","0").param("size","10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("content.size()", is(2)))
                 .andExpect(jsonPath("size", is(10)))
-                .andExpect(jsonPath("content[0].status", is(Status.APPROVEDMANAGER.getStatus())))
+                .andExpect(jsonPath("content[0].status", is(Status.APPROVED.getStatus())))
                 .andExpect(jsonPath("content[0].login", is("user")))
                 .andExpect(jsonPath("content[1].status", is(Status.REJECTED.getStatus())))
                 .andExpect(jsonPath("content[1].login", is("user")));
@@ -136,13 +119,13 @@ public class LeaveRequestControllerTest extends ControllerTest
         dates.add(c.getTime());
         Mockito.when(leaveRequestService.getAllDisabledDatesByLogin("user")).thenReturn(dates);
     
-        mockMvc.perform(get("/api/leaverequest/person/2/disableddates"))
+        mockMvc.perform(get("/api/leaverequest/person/user/disableddates"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()", is(3)));
     }
     
     @Test
-    public void getAllLeaveRequestsByStatusWaiting() throws Exception
+    public void getAllLeaveRequestsByStatus() throws Exception
     {
         //Given
         List<LeaveRequest> leaveRequests = new ArrayList<>();
@@ -150,7 +133,7 @@ public class LeaveRequestControllerTest extends ControllerTest
         Mockito.when(leaveRequestService.getAllLeaveRequestsByStatus(Status.WAITINGAPPROVAL.getStatus(), new PageRequest(0,10)))
                 .thenReturn(new PageImpl<LeaveRequest>(leaveRequests, new PageRequest(0,10), 100));
         
-        mockMvc.perform(get("/api/leaverequest/waiting").param("page","0").param("size","10"))
+        mockMvc.perform(get("/api/leaverequest/status/waiting").param("page","0").param("size","10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("content.size()", is(1)))
                 .andExpect(jsonPath("size", is(10)))
@@ -159,40 +142,22 @@ public class LeaveRequestControllerTest extends ControllerTest
     }
     
     @Test
-    public void getAllLeaveRequestsByStatusApprovedByManager() throws Exception
-    {
-        //Given
-        List<LeaveRequest> leaveRequests = new ArrayList<>();
-        leaveRequests.add(new LeaveRequest().setStatus(Status.APPROVEDMANAGER.getStatus()).setId(2L));
-        Mockito.when(leaveRequestService.getAllLeaveRequestsByStatus(Status.APPROVEDMANAGER.getStatus(), new PageRequest(0,10)))
-                .thenReturn(new PageImpl<LeaveRequest>(leaveRequests, new PageRequest(0,10), 100));
-        
-        mockMvc.perform(get("/api/leaverequest/approvedmanager").param("page","0").param("size","10"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("content.size()", is(1)))
-                .andExpect(jsonPath("size", is(10)))
-                .andExpect(jsonPath("content[0].status", is(Status.APPROVEDMANAGER.getStatus())))
-                .andExpect(jsonPath("content[0].id", is(2)));
-    }
-    
-    @Test
     public void getLeaveRequestById() throws Exception
     {
         //Given
-        LeaveRequest returnedLeaveRequest = new LeaveRequest().setId(1L).setStatus(Status.APPROVEDMANAGER.getStatus());
+        LeaveRequest returnedLeaveRequest = new LeaveRequest().setId(1L).setStatus(Status.APPROVED.getStatus());
         Mockito.when(leaveRequestService.getLeaveRequestById(1L)).thenReturn(returnedLeaveRequest);
         
         mockMvc.perform(get("/api/leaverequest/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status", is(Status.APPROVEDMANAGER.getStatus())));
+                .andExpect(jsonPath("$.status", is(Status.APPROVED.getStatus())));
     }
     
     @Test
     public void createLeaveRequest() throws Exception
     {
         LeaveRequestDTO dto = new LeaveRequestDTO(1L, "user", "Annual leave", new Date(),
-                new Date(), 10, new Date(), new Date(), null,
-                Status.WAITINGAPPROVAL.getStatus(),"vacation");
+                new Date(), 10, new Date(), null, Status.WAITINGAPPROVAL.getStatus(),"vacation");
         
         mockMvc.perform(post("/api/leaverequest")
                 .accept(MediaType.APPLICATION_JSON)
@@ -211,24 +176,24 @@ public class LeaveRequestControllerTest extends ControllerTest
     public void updateLeaveRequestStatusApprovedByManager() throws Exception
     {
         //Given
-        LeaveRequest returnedLeaveRequest = new LeaveRequest().setId(1L).setStatus(Status.APPROVEDMANAGER.getStatus());
-        Mockito.when(leaveRequestService.updateLeaveRequestApprovedByManager(1L)).thenReturn(returnedLeaveRequest);
+        LeaveRequest returnedLeaveRequest = new LeaveRequest().setId(1L).setStatus(Status.APPROVED.getStatus());
+        Mockito.when(leaveRequestService.updateLeaveRequestApproved(1L)).thenReturn(returnedLeaveRequest);
     
-        mockMvc.perform(put("/api/leaverequest/1/changestatus/approved/manager"))
+        mockMvc.perform(put("/api/leaverequest/1/changestatus/approved"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status", is(Status.APPROVEDMANAGER.getStatus())));
+                .andExpect(jsonPath("$.status", is(Status.APPROVED.getStatus())));
     }
     
     @Test
     public void updateLeaveRequestStatusApprovedByHr() throws Exception
     {
         //Given
-        LeaveRequest returnedLeaveRequest = new LeaveRequest().setId(1L).setStatus(Status.APPROVEDHR.getStatus());
-        Mockito.when(leaveRequestService.updateLeaveRequestApprovedByHR(1L)).thenReturn(returnedLeaveRequest);
+        LeaveRequest returnedLeaveRequest = new LeaveRequest().setId(1L).setStatus(Status.APPROVED.getStatus());
+        Mockito.when(leaveRequestService.updateLeaveRequestApproved(1L)).thenReturn(returnedLeaveRequest);
         
-        mockMvc.perform(put("/api/leaverequest/1/changestatus/approved/hr"))
+        mockMvc.perform(put("/api/leaverequest/1/changestatus/approved"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status", is(Status.APPROVEDHR.getStatus())));
+                .andExpect(jsonPath("$.status", is(Status.APPROVED.getStatus())));
     }
     
     @Test
@@ -266,11 +231,11 @@ public class LeaveRequestControllerTest extends ControllerTest
     public void testSecurity() throws Exception
     {
         //Given
-        LeaveRequest returnedLeaveRequest = new LeaveRequest().setId(1L).setStatus(Status.APPROVEDMANAGER.getStatus());
-        Mockito.when(leaveRequestService.updateLeaveRequestApprovedByManager(1L)).thenReturn(returnedLeaveRequest);
+        LeaveRequest returnedLeaveRequest = new LeaveRequest().setId(1L).setStatus(Status.APPROVED.getStatus());
+        Mockito.when(leaveRequestService.updateLeaveRequestApproved(1L)).thenReturn(returnedLeaveRequest);
     
-        mockMvc.perform(put("/api/leaverequest/1/changestatus/approved/manager"))
+        mockMvc.perform(put("/api/leaverequest/1/changestatus/approved"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status", is(Status.APPROVEDMANAGER.getStatus())));
+                .andExpect(jsonPath("$.status", is(Status.APPROVED.getStatus())));
     }
 }

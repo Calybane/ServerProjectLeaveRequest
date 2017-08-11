@@ -46,26 +46,6 @@ public class LeaveRequestServiceImplTest
     LeaveRequestServiceImpl classUnderTest;
     
     @Test
-    public void getAllLeaveRequests()
-    {
-        //Given
-        LeaveRequest leaveRequest = Mockito.mock(LeaveRequest.class);
-        
-        List<LeaveRequest> leaveRequests = new ArrayList<>();
-        leaveRequests.add(leaveRequest);
-        Mockito.when(leaveRequestRepository.findAll(new PageRequest(0, 10)))
-                .thenReturn(new PageImpl<>(leaveRequests, new PageRequest(0,10), 100));
-    
-        //When
-        Page<LeaveRequest> allLeaveRequests = classUnderTest.getAllLeaveRequests(new PageRequest(0, 10));
-    
-        //Then
-        assertEquals(allLeaveRequests.getTotalElements(), 100);
-        assertEquals(allLeaveRequests.getSize(), 10);
-        assertEquals(allLeaveRequests.getContent().get(0), leaveRequest);
-    }
-    
-    @Test
     public void getAllLeaveRequestsViews()
     {
         //Given
@@ -123,7 +103,7 @@ public class LeaveRequestServiceImplTest
     }
     
     @Test
-    public void getAllLeaveRequestsBystatusWaiting()
+    public void getAllLeaveRequestsBystatus()
     {
         //Given
         LeaveRequest leaveRequest = Mockito.mock(LeaveRequest.class);
@@ -144,18 +124,18 @@ public class LeaveRequestServiceImplTest
     }
     
     @Test
-    public void getAllLeaveRequestsByStatusApprovedByManager()
+    public void getAllLeaveRequestsByStatusApproved()
     {
         //Given
         LeaveRequest leaveRequest = Mockito.mock(LeaveRequest.class);
         
         List<LeaveRequest> leaveRequests = new ArrayList<>();
         leaveRequests.add(leaveRequest);
-        Mockito.when(leaveRequestRepository.findAllByStatusLike(Status.APPROVEDMANAGER.getStatus(), new PageRequest(0, 10)))
+        Mockito.when(leaveRequestRepository.findAllByStatusLike(Status.APPROVED.getStatus(), new PageRequest(0, 10)))
                 .thenReturn(new PageImpl<>(leaveRequests, new PageRequest(0,10), 100));
         
         //When
-        Page<LeaveRequest> allLeaveRequests = classUnderTest.getAllLeaveRequestsByStatus(Status.APPROVEDMANAGER.getStatus(), new
+        Page<LeaveRequest> allLeaveRequests = classUnderTest.getAllLeaveRequestsByStatus(Status.APPROVED.getStatus(), new
                 PageRequest(0, 10));
         
         //Then
@@ -183,7 +163,7 @@ public class LeaveRequestServiceImplTest
     {
         //Given
         LeaveRequest returnedLeaveRequest = Mockito.mock(LeaveRequest.class);
-        LeaveRequestDTO dto = new LeaveRequestDTO(1L, "user", "Annual leave", new Date(), new Date(), 1, new Date(),
+        LeaveRequestDTO dto = new LeaveRequestDTO(1L, "user", "Annual leave", new Date(), new Date(), 1,
                 null, null, Status.WAITINGAPPROVAL.getStatus(), "vacation");
         Mockito.when(leaveRequestRepository.save(any(LeaveRequest.class))).thenReturn(returnedLeaveRequest);
         
@@ -198,43 +178,28 @@ public class LeaveRequestServiceImplTest
     public void approveInexistingLeaveRequestByManager()
     {
         Mockito.when(leaveRequestRepository.findOne(456L)).thenReturn(null);
-        classUnderTest.updateLeaveRequestApprovedByManager(456L);
+        classUnderTest.updateLeaveRequestApproved(456L);
     }
     
     @Test(expected = EntityNotFoundException.class)
     public void approveInexistingLeaveRequestByHR()
     {
         Mockito.when(leaveRequestRepository.findOne(456L)).thenReturn(null);
-        classUnderTest.updateLeaveRequestApprovedByHR(456L);
+        classUnderTest.updateLeaveRequestApproved(456L);
     }
     
     @Test
-    public void approveExistingLeaveRequestByManager()
+    public void approveExistingLeaveRequest()
     {
         //Given
         LeaveRequest mockedLeaveRequest = Mockito.mock(LeaveRequest.class);
         Mockito.when(leaveRequestRepository.findOne(2L)).thenReturn(mockedLeaveRequest);
     
         //When
-        classUnderTest.updateLeaveRequestApprovedByManager(2L);
+        classUnderTest.updateLeaveRequestApproved(2L);
         
         //Then
-        Mockito.verify(mockedLeaveRequest).setStatus(Status.APPROVEDMANAGER.getStatus());
-        Mockito.verify(leaveRequestRepository).save(mockedLeaveRequest);
-    }
-    
-    @Test
-    public void approveExistingLeaveRequestByHR()
-    {
-        //Given
-        LeaveRequest mockedLeaveRequest = Mockito.mock(LeaveRequest.class);
-        Mockito.when(leaveRequestRepository.findOne(2L)).thenReturn(mockedLeaveRequest);
-        
-        //When
-        classUnderTest.updateLeaveRequestApprovedByHR(2L);
-        
-        //Then
-        Mockito.verify(mockedLeaveRequest).setStatus(Status.APPROVEDHR.getStatus());
+        Mockito.verify(mockedLeaveRequest).setStatus(Status.APPROVED.getStatus());
         Mockito.verify(leaveRequestRepository).save(mockedLeaveRequest);
     }
     
@@ -247,10 +212,10 @@ public class LeaveRequestServiceImplTest
         Mockito.when(leaveRequestRepository.findOne(1L)).thenReturn(mockedLeaveRequest);
         
         //When
-        classUnderTest.updateLeaveRequestApprovedByManager(1L);
+        classUnderTest.updateLeaveRequestApproved(1L);
         
         //Then
-        Mockito.verify(mockedLeaveRequest).setStatus(Status.APPROVEDMANAGER.getStatus());
+        Mockito.verify(mockedLeaveRequest).setStatus(Status.APPROVED.getStatus());
         Mockito.verify(leaveRequestRepository).save(mockedLeaveRequest);
     }
     

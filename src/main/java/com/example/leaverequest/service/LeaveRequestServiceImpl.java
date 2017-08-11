@@ -11,18 +11,24 @@ import com.example.leaverequest.model.User;
 import com.example.leaverequest.repository.HolidayDateRepository;
 import com.example.leaverequest.repository.LeaveRequestRepository;
 import com.example.leaverequest.repository.UserRepository;
+import com.example.leaverequest.view.LeaveRequestView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Predicate;
 
 @Service
 public class LeaveRequestServiceImpl implements LeaveRequestService
@@ -54,9 +60,34 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
     
     @Override
     @PreAuthorize("isAuthenticated()")
-    public Page<LeaveRequest> getAllLeaveRequests(Pageable pageable)
+    public List<LeaveRequestView> getAllLeaveRequestsView()
     {
-        return leaveRequestRepository.findAll(pageable);
+        List<LeaveRequestView> requestViews = new ArrayList<>();
+        List<Object> views = leaveRequestRepository.findAllViews();
+        for (Object o : views)
+        {
+            Object[] obj = (Object[]) o;
+            LeaveRequestView request = new LeaveRequestView();
+            try
+            {
+                request.setId(Long.parseLong(String.valueOf(obj[0])));
+                request.setLogin(String.valueOf(obj[1]));
+                request.setDaysLeft(Integer.parseInt(String.valueOf(obj[2])));
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                request.setRequestDate(df.parse(String.valueOf(obj[3])));
+                if (obj[4] != null) {
+                    request.setApprovalDate(df.parse(String.valueOf(obj[4])));
+                }
+                request.setLeaveFrom(df.parse(String.valueOf(obj[5])));
+                request.setLeaveTo(df.parse(String.valueOf(obj[6])));
+                request.setDaysTaken(Integer.parseInt(String.valueOf(obj[7])));
+                request.setStatus(String.valueOf(obj[8]));
+            } catch (Exception ex) {
+                System.out.println("Parse exception");
+            }
+            requestViews.add(request);
+        }
+        return requestViews;
     }
     
     @Override
@@ -111,8 +142,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
     {
         LeaveRequest leaveRequest = new LeaveRequest(dto);
         leaveRequest.setStatus(Status.WAITINGAPPROVAL.getStatus())
-                .setApprovalManagerDate(null)
-                .setApprovalHRDate(null)
+                .setApprovalDate(null)
                 .setLeaveFrom(Utils.getZeroTimeDate(leaveRequest.getLeaveFrom()))
                 .setLeaveTo(Utils.getZeroTimeDate(leaveRequest.getLeaveTo()))
                 .setRequestDate(Utils.getZeroTimeDate(new Date()));
@@ -148,43 +178,23 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
     
     @Override
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGER')")
-    public LeaveRequest updateLeaveRequestApprovedByManager(long id)
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MANAGER') or hasAuthority('HR')")
+    public LeaveRequest updateLeaveRequestApproved(long id)
     {
         LeaveRequest leaveRequest = leaveRequestRepository.findOne(id);
+        
+        Predicate<GrantedAuthority> predicate = p -> p.getAuthority().toLowerCase().equals("manager") || p.getAuthority().toLowerCase().equals("hr");
+        
         if(leaveRequest == null) {
             throw new EntityNotFoundException("Leave request with id " + id + " not found.");
         } else if (!leaveRequest.getStatus().equals(Status.WAITINGAPPROVAL.getStatus())) {
             throw new EntityBadInformationsException("This leave request is not in '" + Status.WAITINGAPPROVAL.getStatus() + "'");
-        } else if (SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                    .stream().noneMatch(role -> role.getAuthority().toLowerCase().equals("manager"))) {
-            throw new EntityBadInformationsException("The user is not an manager");
+        } else if (SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().noneMatch(predicate)) {
+            throw new EntityBadInformationsException("The user is not a manager or a HR");
         } else {
-            leaveRequest.setStatus(Status.APPROVEDMANAGER.getStatus());
-            leaveRequest.setApprovalManagerDate(new Date());
+            leaveRequest.setStatus(Status.APPROVED.getStatus());
+            leaveRequest.setApprovalDate(new Date());
             
-            System.out.println("Updating leaverequest : id=" + leaveRequest.getId() + ", status='" + leaveRequest.getStatus() + "'");
-            return leaveRequestRepository.save(leaveRequest);
-        }
-    }
-    
-    @Override
-    @Transactional
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HR')")
-    public LeaveRequest updateLeaveRequestApprovedByHR(long id)
-    {
-        LeaveRequest leaveRequest = leaveRequestRepository.findOne(id);
-        if(leaveRequest == null) {
-            throw new EntityNotFoundException("Leave request with id " + id + " not found");
-        } else if (!leaveRequest.getStatus().equals(Status.APPROVEDMANAGER.getStatus())) {
-            throw new EntityBadInformationsException("This leave request is not in '" + Status.APPROVEDMANAGER.getStatus() + "'");
-        } else if (SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                    .stream().noneMatch(role -> role.getAuthority().toLowerCase().equals("hr"))) {
-            throw new EntityBadInformationsException("The user is not an HR");
-        } else {
-            leaveRequest.setStatus(Status.APPROVEDHR.getStatus());
-            leaveRequest.setApprovalHRDate(new Date());
-    
             System.out.println("Updating leaverequest : id=" + leaveRequest.getId() + ", status='" + leaveRequest.getStatus() + "'");
             return leaveRequestRepository.save(leaveRequest);
         }
@@ -200,8 +210,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService
             throw new EntityNotFoundException("Leave request with id " + id + " not found");
         } else {
             leaveRequest.setStatus(Status.REJECTED.getStatus());
-            if(leaveRequest.getApprovalManagerDate() == null) leaveRequest.setApprovalManagerDate(new Date());
-            else leaveRequest.setApprovalHRDate(new Date());
+            leaveRequest.setApprovalDate(new Date());
     
             System.out.println("Updating leaverequest : id=" + leaveRequest.getId() + ", status='" + leaveRequest.getStatus() + "'");
             userRepository.addDays(leaveRequest.getDaysTaken(), leaveRequest.getLogin());

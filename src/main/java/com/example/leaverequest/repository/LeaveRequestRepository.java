@@ -1,6 +1,7 @@
 package com.example.leaverequest.repository;
 
 import com.example.leaverequest.model.LeaveRequest;
+import com.example.leaverequest.view.LeaveRequestView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,6 +22,13 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
     List<LeaveRequest> findAllByLoginAndLeaveFromAfter(String login, Date date);
     
     List<LeaveRequest> findAllByStatusNotLike(String status);
+    
+    @Query(value = "SELECT LEAVE_REQUEST.ID as id, LEAVE_REQUEST.LOGIN, USER.DAYS_LEFT, LEAVE_REQUEST.REQUEST_DATE, " +
+                    "LEAVE_REQUEST.APPROVAL_DATE, LEAVE_REQUEST.LEAVE_FROM, LEAVE_REQUEST.LEAVE_TO, " +
+                    "LEAVE_REQUEST.DAYS_TAKEN, LEAVE_REQUEST.STATUS FROM LEAVE_REQUEST LEFT JOIN USER ON " +
+                    "LEAVE_REQUEST.LOGIN = USER.LOGIN ORDER BY LEAVE_REQUEST.LOGIN, LEAVE_REQUEST.LEAVE_FROM",
+                    nativeQuery = true)
+    List<Object> findAllViews();
     
     @Transactional
     @Modifying

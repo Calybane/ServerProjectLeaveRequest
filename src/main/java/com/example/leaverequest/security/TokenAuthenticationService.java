@@ -49,13 +49,14 @@ class TokenAuthenticationService {
                     }
                     if (user.equals("hr"))
                     {
+                        updatedAuthorities.add(new SimpleGrantedAuthority("MANAGER"));
                         updatedAuthorities.add(new SimpleGrantedAuthority("HR"));
                     }
                     if (user.equals("admin"))
                     {
-                        updatedAuthorities.add(new SimpleGrantedAuthority("ADMIN"));
                         updatedAuthorities.add(new SimpleGrantedAuthority("MANAGER"));
                         updatedAuthorities.add(new SimpleGrantedAuthority("HR"));
+                        updatedAuthorities.add(new SimpleGrantedAuthority("ADMIN"));
                     }
         
                     return new UsernamePasswordAuthenticationToken(user, null, updatedAuthorities);

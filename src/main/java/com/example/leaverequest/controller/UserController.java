@@ -67,4 +67,10 @@ public class UserController
     {
         return new ResponseEntity(userService.updateUser(dto), HttpStatus.OK);
     }
+    
+    @RequestMapping(method = PUT, path = "/adddays", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<User> addDaysUser(@Valid @RequestBody final UserDTO dto)
+    {
+        return new ResponseEntity(userService.addDaysUser(dto), HttpStatus.OK);
+    }
 }

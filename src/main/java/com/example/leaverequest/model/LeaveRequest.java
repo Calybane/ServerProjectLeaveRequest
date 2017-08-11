@@ -34,11 +34,8 @@ public class LeaveRequest
     @Column(nullable = false, name = "REQUEST_DATE")
     private Date requestDate;
     
-    @Column(name = "APPROVAL_MANAGER_DATE")
-    private Date approvalManagerDate;
-    
-    @Column(name = "APPROVAL_HR_DATE")
-    private Date approvalHRDate;
+    @Column(name = "APPROVAL_DATE")
+    private Date approvalDate;
     
     @Column(nullable = false, name = "STATUS")
     private String status;
@@ -60,8 +57,7 @@ public class LeaveRequest
         this.leaveTo = dto.getLeaveTo();
         this.daysTaken = dto.getDaysTaken();
         this.requestDate = dto.getRequestDate();
-        this.approvalManagerDate = dto.getApprovalManagerDate();
-        this.approvalHRDate = dto.getApprovalHRDate();
+        this.approvalDate = dto.getApprovalDate();
         this.status = dto.getStatus();
         this.description = dto.getDescription();
     }
@@ -144,25 +140,14 @@ public class LeaveRequest
         return this;
     }
     
-    public Date getApprovalManagerDate()
+    public Date getApprovalDate()
     {
-        return approvalManagerDate;
+        return approvalDate;
     }
     
-    public LeaveRequest setApprovalManagerDate(Date approvalManagerDate)
+    public LeaveRequest setApprovalDate(Date approvalDate)
     {
-        this.approvalManagerDate = approvalManagerDate;
-        return this;
-    }
-    
-    public Date getApprovalHRDate()
-    {
-        return approvalHRDate;
-    }
-    
-    public LeaveRequest setApprovalHRDate(Date approvalHRDate)
-    {
-        this.approvalHRDate = approvalHRDate;
+        this.approvalDate = approvalDate;
         return this;
     }
     
@@ -199,8 +184,7 @@ public class LeaveRequest
                 ", leaveTo=" + leaveTo +
                 ", daysTaken=" + daysTaken +
                 ", requestDate=" + requestDate +
-                ", approvalManagerDate=" + approvalManagerDate +
-                ", approvalHRDate=" + approvalHRDate +
+                ", approvalDate=" + approvalDate +
                 ", status='" + status + '\'' +
                 ", description='" + description + '\'' +
                 '}';

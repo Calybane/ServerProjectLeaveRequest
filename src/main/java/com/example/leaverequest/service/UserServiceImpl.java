@@ -61,4 +61,16 @@ public class UserServiceImpl implements UserService
             return userRepository.save(user);
         }
     }
+    
+    @Override
+    @Transactional
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HR')")
+    public User addDaysUser(UserDTO dto)
+    {
+        if (dto.getLogin().trim().length() > 0){
+            userRepository.addDays(dto.getDaysLeft(), dto.getLogin());
+            return userRepository.findByLogin(dto.getLogin());
+        }
+        return null;
+    }
 }

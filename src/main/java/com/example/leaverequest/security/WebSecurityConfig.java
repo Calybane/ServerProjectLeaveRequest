@@ -137,7 +137,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
             .and()
             .withUser(hrLogin).password(hrPassword)
                 .roles(userRole, hrRole)
-                .authorities(userRole, hrRole)
+                .authorities(userRole, managerRole, hrRole)
             .and()
             .withUser(adminLogin).password(adminPassword)
                 .roles(userRole, adminRole, managerRole, hrRole)

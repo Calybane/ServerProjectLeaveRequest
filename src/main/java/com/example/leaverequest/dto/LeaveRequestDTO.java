@@ -35,9 +35,7 @@ public class LeaveRequestDTO
     @NotNull
     private final Date requestDate;
     
-    private final Date approvalManagerDate;
-    
-    private final Date approvalHRDate;
+    private final Date approvalDate;
     
     @NotNull
     private final String status;
@@ -54,8 +52,7 @@ public class LeaveRequestDTO
             @JsonProperty("leaveTo") Date leaveTo,
             @JsonProperty("daysTaken") int daysTaken,
             @JsonProperty("requestDate") Date requestDate,
-            @JsonProperty("approvalManagerDate") Date approvalManagerDate,
-            @JsonProperty("approvalHRDate") Date approvalHRDate,
+            @JsonProperty("approvalDate") Date approvalDate,
             @JsonProperty("status") String status,
             @JsonProperty("description") String description) {
         if(id != null) this.id = id;
@@ -65,8 +62,7 @@ public class LeaveRequestDTO
         this.leaveTo = leaveTo;
         this.daysTaken = daysTaken;
         this.requestDate = requestDate;
-        this.approvalManagerDate = approvalManagerDate;
-        this.approvalHRDate = approvalHRDate;
+        this.approvalDate = approvalDate;
         this.status = status;
         this.description = description;
     }
@@ -111,14 +107,9 @@ public class LeaveRequestDTO
         return requestDate;
     }
     
-    public Date getApprovalManagerDate()
+    public Date getApprovalDate()
     {
-        return approvalManagerDate;
-    }
-    
-    public Date getApprovalHRDate()
-    {
-        return approvalHRDate;
+        return approvalDate;
     }
     
     public String getStatus()
@@ -142,8 +133,7 @@ public class LeaveRequestDTO
                 ", leaveTo=" + leaveTo +
                 ", daysTaken=" + daysTaken +
                 ", requestDate=" + requestDate +
-                ", approvalManagerDate=" + approvalManagerDate +
-                ", approvalHRDate=" + approvalHRDate +
+                ", approvalManagerDate=" + approvalDate +
                 ", status='" + status + '\'' +
                 ", description='" + description + '\'' +
                 '}';

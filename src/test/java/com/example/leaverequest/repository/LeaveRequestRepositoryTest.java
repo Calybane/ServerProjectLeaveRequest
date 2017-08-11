@@ -44,9 +44,7 @@ public class LeaveRequestRepositoryTest extends AbstractTransactionalJUnit4Sprin
     @Test
     public void findAllByPersonId() throws Exception
     {
-        Page<LeaveRequest> all = leaveRequestRepository.findAllByLogin("user", new PageRequest(0, 10, Sort.Direction
-                .ASC,
-                "leaveFrom"));
+        Page<LeaveRequest> all = leaveRequestRepository.findAllByLogin("user", new PageRequest(0, 10, Sort.Direction.ASC, "leaveFrom"));
         Assert.assertEquals(all.getTotalElements(), 1);
         Assert.assertEquals(all.getContent().get(0).getLogin(), "user");
     }
@@ -54,8 +52,7 @@ public class LeaveRequestRepositoryTest extends AbstractTransactionalJUnit4Sprin
     @Test
     public void findAllByStatusLike() throws Exception
     {
-        Page<LeaveRequest> all = leaveRequestRepository.findAllByStatusLike(Status.WAITINGAPPROVAL.getStatus(), new PageRequest
-                (0, 10));
+        Page<LeaveRequest> all = leaveRequestRepository.findAllByStatusLike(Status.WAITINGAPPROVAL.getStatus(), new PageRequest(0, 10));
         Assert.assertEquals(all.getTotalElements(), 3);
         Assert.assertEquals(all.getContent().get(0).getStatus(), Status.WAITINGAPPROVAL.getStatus());
         Assert.assertEquals(all.getContent().get(1).getStatus(), Status.WAITINGAPPROVAL.getStatus());
